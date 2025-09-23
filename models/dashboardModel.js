@@ -130,16 +130,14 @@ const getTotalData = async ({
   console.log('Params:', params);
 
   return new Promise((resolve, reject) => {
-    db.getConnection((err, connection) => {
-      if (err) return reject(err);
+    
 
-      connection.query(query, params, (error, results) => {
-        connection.release();
+      db.query(query, params, (error, results) => {
         if (error) return reject(error);
 
         resolve(results.length || 0);
       });
-    });
+    
   });
 };
 
@@ -170,8 +168,7 @@ const getParticularStatusCallsOfCrm = (crm_id, status, callback) => {
 
 
 const getConsultantSettingData = (consultantid = "", callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err, null);
+  
 
     let sql = `SELECT * FROM tbl_consultant_setting`;
     const params = [];
@@ -183,17 +180,16 @@ const getConsultantSettingData = (consultantid = "", callback) => {
 
     sql += ` ORDER BY id DESC LIMIT 1`;
 
-    connection.query(sql, params, (error, results) => {
-      connection.release();
+    db.query(sql, params, (error, results) => {
+      
       if (error) return callback(error, null);
       return callback(null, results[0] || null);
     });
-  });
+  
 };
 
 const updateConsultantSettings = (consultantid, data, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     const fields = Object.keys(data)
       .map((key) => `${key} = ?`)
@@ -208,12 +204,12 @@ const updateConsultantSettings = (consultantid, data, callback) => {
       WHERE fld_consultantid = ?
     `;
 
-    connection.query(sql, values, (error, result) => {
-      connection.release();
+    db.query(sql, values, (error, result) => {
+     
       if (error) return callback(error);
       return callback(null, result);
     });
-  });
+  
 };
 
 

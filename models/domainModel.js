@@ -4,16 +4,14 @@ const moment = require("moment-timezone");
 
 const checkIfDomainExists = (domain, callback) => {
   const query = "SELECT COUNT(*) AS cnt FROM tbl_domain_pref WHERE domain = ?";
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(query, [domain], (error, results) => {
-      connection.release();
+    db.query(query, [domain], (error, results) => {
       if (error) return callback(error);
       const exists = results[0]?.cnt > 0;
       callback(null, exists);
     });
-  });
+  
 };
 
 const insertDomainPref = (data, callback) => {
@@ -22,29 +20,26 @@ const insertDomainPref = (data, callback) => {
   const placeholders = fields.map(() => "?").join(", ");
   const query = `INSERT INTO tbl_domain_pref (${fields.join(", ")}) VALUES (${placeholders})`;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(query, values, (error, result) => {
-      connection.release();
+    db.query(query, values, (error, result) => {
+      
       if (error) return callback(error);
       callback(null, result.insertId);
     });
-  });
+  
 };
 
 const checkIfDomainExistsForUpdate = (domain, id, callback) => {
   const query = "SELECT COUNT(*) AS cnt FROM tbl_domain_pref WHERE domain = ? AND id != ?";
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(query, [domain, id], (error, results) => {
-      connection.release();
+    db.query(query, [domain, id], (error, results) => {
+      
       if (error) return callback(error);
       const exists = results[0]?.cnt > 0;
       callback(null, exists);
     });
-  });
+  
 };
 
 const updateDomainPref = (id, data, callback) => {
@@ -53,27 +48,20 @@ const updateDomainPref = (id, data, callback) => {
   const updates = fields.map(field => `${field} = ?`).join(", ");
   const query = `UPDATE tbl_domain_pref SET ${updates} WHERE id = ?`;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(query, [...values, id], (error, result) => {
-      connection.release();
+    db.query(query, [...values, id], (error, result) => {
+      
       if (error) return callback(error);
       callback(null, result.affectedRows);
     });
-  });
+  
 };
 
 const deleteDomainById = (id, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("Connection error:", err);
-      return callback(err, null);
-    }
-
+ 
     const query = "DELETE FROM tbl_domain_pref WHERE id = ?";
-    connection.query(query, [id], (error, result) => {
-      connection.release();
+    db.query(query, [id], (error, result) => {
+      
 
       if (error) {
         console.error("Query error:", error);
@@ -82,21 +70,20 @@ const deleteDomainById = (id, callback) => {
 
       callback(null, result);
     });
-  });
+  
 };
 
 const updateDomainStatus = (domainId, status, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     const sql = `UPDATE tbl_domain_pref SET status = ? WHERE id = ?`;
 
-    connection.query(sql, [status, domainId], (queryErr, result) => {
-      connection.release();
+    db.query(sql, [status, domainId], (queryErr, result) => {
+      
       if (queryErr) return callback(queryErr);
       return callback(null, result);
     });
-  });
+  
 };
 
 const getDomainbyId = (domainId, callback) => {
@@ -104,11 +91,10 @@ const getDomainbyId = (domainId, callback) => {
 
   const query = 'SELECT * FROM tbl_domain_pref WHERE id = ?';
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(query, [domainId], (error, results) => {
-      connection.release();
+
+    db.query(query, [domainId], (error, results) => {
+      
       if (error) return callback(error);
 
       if (results.length > 0) {
@@ -117,7 +103,7 @@ const getDomainbyId = (domainId, callback) => {
         callback(null, null); 
       }
     });
-  });
+  
 };
 
 module.exports = {

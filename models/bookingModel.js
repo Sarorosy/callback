@@ -210,12 +210,12 @@ const getBookings = (
   // -------------------------
   // Execute query
   // -------------------------
-  const executeQuery = (conn) => {
+  const executeQuery = () => {
     buildFilters();
     sql += getOrderByClause();
 
-    conn.query(sql, params, (err, results) => {
-      conn.release();
+    db.query(sql, params, (err, results) => {
+      
       if (err) return callback(err);
       callback(null, results);
     });
@@ -224,11 +224,10 @@ const getBookings = (
   // -------------------------
   // Role Handling
   // -------------------------
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     if (userType === "SUPERADMIN") {
-      executeQuery(connection);
+      executeQuery();
 
 
     }
@@ -247,15 +246,14 @@ const getBookings = (
             .join(" OR ");
           const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
 
-          connection.query(adminQuery, teamIds, (err, adminRows) => {
+          db.query(adminQuery, teamIds, (err, adminRows) => {
             if (err) {
-              connection.release();
               return callback(err);
             }
 
             const consultantIds = adminRows.map((row) => row.id);
             if (consultantIds.length === 0) {
-              connection.release();
+             
               return callback(null, []);
             }
 
@@ -263,12 +261,12 @@ const getBookings = (
             sql += ` AND b.fld_consultantid IN (${uidPlaceholders})`;
             params.push(...consultantIds);
 
-            executeQuery(connection);
+            executeQuery();
           });
         } else {
           sql += ` AND b.fld_consultantid = ?`;
           params.push(userId);
-          executeQuery(connection);
+          executeQuery();
         }
       } else {
         // Other SUBADMINs: fetch bookings added by them or their team members
@@ -278,9 +276,8 @@ const getBookings = (
             .join(" OR ");
           const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
 
-          connection.query(adminQuery, teamIds, (err, adminRows) => {
+          db.query(adminQuery, teamIds, (err, adminRows) => {
             if (err) {
-              connection.release();
               return callback(err);
             }
 
@@ -288,7 +285,6 @@ const getBookings = (
             const uniqueUserIds = [...new Set([...adminIds, userId])];
 
             if (uniqueUserIds.length === 0) {
-              connection.release();
               return callback(null, []);
             }
 
@@ -296,12 +292,12 @@ const getBookings = (
             sql += ` AND (b.fld_consultantid IN (${uidPlaceholders}) OR b.fld_addedby IN (${uidPlaceholders}))`;
             params.push(...uniqueUserIds, ...uniqueUserIds);
 
-            executeQuery(connection);
+            executeQuery();
           });
         } else {
           sql += ` AND (b.fld_consultantid = ? OR b.fld_addedby = ?)`;
           params.push(userId, userId);
-          executeQuery(connection);
+          executeQuery();
         }
       }
     } 
@@ -310,16 +306,16 @@ const getBookings = (
       sql += ` AND b.fld_consultantid = ? AND b.fld_call_request_sts NOT IN (?, ?)`;
       params.push(userId, "Consultant Assigned", "Postponed");
 
-      executeQuery(connection);
+      executeQuery();
     } else if (userType === "EXECUTIVE") {
       sql += ` AND b.fld_addedby = ?`;
       params.push(userId);
-      executeQuery(connection);
+      executeQuery();
     } else {
       sql += ` AND 1 = 0`; // fallback - no access
-      executeQuery(connection);
+      executeQuery();
     }
-  });
+  
 };
 
 const getBookingHistory = (bookingId, callback) => {
@@ -340,21 +336,18 @@ const getBookingHistory = (bookingId, callback) => {
     ORDER BY id DESC
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(sql, [bookingId], (queryErr, results) => {
-      connection.release();
+    db.query(sql, [bookingId], (queryErr, results) => {
+   
       if (queryErr) return callback(queryErr);
       return callback(null, results);
     });
-  });
+  
 };
 
 // Get Presales client details from InstaCRM
 const getPresaleClientDetails = (client_id, callback) => {
-  instacrm_db.getConnection((err, connection) => {
-    if (err) return callback(err);
+ 
 
     const queryAssignSQL = `
       SELECT 
@@ -368,14 +361,13 @@ const getPresaleClientDetails = (client_id, callback) => {
       LIMIT 1
     `;
 
-    connection.query(queryAssignSQL, [client_id], (err, assignResult) => {
+    instacrm_db.query(queryAssignSQL, [client_id], (err, assignResult) => {
       if (err) {
-        connection.release();
         return callback(err);
       }
 
       if (!assignResult || assignResult.length === 0) {
-        connection.release();
+        
         return callback(null, null);
       }
 
@@ -392,8 +384,8 @@ const getPresaleClientDetails = (client_id, callback) => {
         LIMIT 1
       `;
 
-      connection.query(queryDetailsSQL, [query_id], (err2, queryResult) => {
-        connection.release();
+      instacrm_db.query(queryDetailsSQL, [query_id], (err2, queryResult) => {
+        
 
         if (err2) return callback(err2);
         if (!queryResult || queryResult.length === 0)
@@ -406,7 +398,7 @@ const getPresaleClientDetails = (client_id, callback) => {
         return callback(null, queryData);
       });
     });
-  });
+  
 };
 
 // const getPostsaleClientDetails = (client_id, callback) => {
@@ -506,19 +498,15 @@ const checkCallrecording = (email, ref_id, callback) => {
       AND fld_addedon > '2025-06-06 00:00:00'
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
-
-    connection.query(
+    db.query(
       sql,
       [email.trim(), ref_id.trim()],
       (queryErr, results) => {
-        connection.release();
         if (queryErr) return callback(queryErr);
         return callback(null, results);
       }
     );
-  });
+  
 };
 
 const checkConsultantClientWebsite = (
@@ -537,17 +525,12 @@ const checkConsultantClientWebsite = (
     LIMIT 1
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("Error getting DB connection:", err);
-      return callback(err, null);
-    }
+  
 
-    connection.query(
+    db.query(
       sql,
       [email, consultantid, "Presales"],
       (queryErr, results) => {
-        connection.release(); // release whether success or failure
 
         if (queryErr) {
           console.error("Query error:", queryErr);
@@ -561,7 +544,7 @@ const checkConsultantClientWebsite = (
         }
       }
     );
-  });
+  
 };
 
 const checkConsultantCompletedCall = (
@@ -571,8 +554,7 @@ const checkConsultantCompletedCall = (
   loginCrmId,
   callback
 ) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     const sql = `
       SELECT * FROM tbl_booking 
@@ -584,14 +566,12 @@ const checkConsultantCompletedCall = (
       ORDER BY id DESC LIMIT 1
     `;
 
-    connection.query(sql, [consultantId, clientEmail, saleType], (err, results) => {
+    db.query(sql, [consultantId, clientEmail, saleType], (err, results) => {
       if (err) {
-        connection.release();
         return callback(err);
       }
 
       if (results.length === 0) {
-        connection.release();
         return callback(null, "call not completed");
       }
 
@@ -603,9 +583,8 @@ const checkConsultantCompletedCall = (
 
       const adminSql = `SELECT fld_team_id FROM tbl_admin WHERE id = ?`;
 
-      connection.query(adminSql, [loginCrmId], (err, adminResults) => {
+      db.query(adminSql, [loginCrmId], (err, adminResults) => {
         if (err) {
-          connection.release();
           return callback(err);
         }
 
@@ -617,7 +596,6 @@ const checkConsultantCompletedCall = (
         const isTeamMatch = bookingTeamIds.some((id) => loginTeamIds.includes(id));
 
         if (isTeamMatch) {
-          connection.release();
           return callback(null, "add call");
         }
 
@@ -627,9 +605,8 @@ const checkConsultantCompletedCall = (
           ORDER BY id DESC LIMIT 1
         `;
 
-        connection.query(historySql, [bookingId], (err, historyResults) => {
+        db.query(historySql, [bookingId], (err, historyResults) => {
           if (err) {
-            connection.release();
             return callback(err);
           }
 
@@ -645,8 +622,8 @@ const checkConsultantCompletedCall = (
               ORDER BY id DESC LIMIT 1
             `;
 
-            connection.query(overallSql, [bookingId], (err, overallResults) => {
-              connection.release();
+            db.query(overallSql, [bookingId], (err, overallResults) => {
+              
               if (err) return callback(err);
 
               if (overallResults.length === 0) {
@@ -661,7 +638,6 @@ const checkConsultantCompletedCall = (
               );
             });
           } else {
-            connection.release();
             const msg = `Call completed with client ${result1.fld_name} by consultant ${consultantId} on date ${callCompletedDate}`;
             return callback(
               null,
@@ -671,15 +647,11 @@ const checkConsultantCompletedCall = (
         });
       });
     });
-  });
+  
 };
 
 const checkPresalesCall = (email, consultantId, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("DB connection error:", err);
-      return callback(err, null);
-    }
+  
 
     const query = `
       SELECT * FROM tbl_booking 
@@ -693,8 +665,7 @@ const checkPresalesCall = (email, consultantId, callback) => {
 
     const values = [email, consultantId];
 
-    connection.query(query, values, (error, results) => {
-      connection.release(); // Important to release connection
+    db.query(query, values, (error, results) => {
 
       if (error) {
         console.error("Query error:", error);
@@ -703,7 +674,7 @@ const checkPresalesCall = (email, consultantId, callback) => {
 
       return callback(null, results);
     });
-  });
+  
 };
 
 const getClientCallsRequestPlanLimitOver = (
@@ -720,15 +691,13 @@ const getClientCallsRequestPlanLimitOver = (
     WHERE fld_email = ? AND callDisabled = ? AND fld_rc_milestoneid = ?
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(query, [email, status, milestoneId], (error, results) => {
-      connection.release();
+    db.query(query, [email, status, milestoneId], (error, results) => {
+     
       if (error) return callback(error);
       callback(null, results[0]);
     });
-  });
+  
 };
 
 const getMeetingId = (callback) => {
@@ -740,11 +709,8 @@ const getMeetingId = (callback) => {
     LIMIT 1
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(query, (error, results) => {
-      connection.release();
+    db.query(query, (error, results) => {
       if (error) return callback(error);
 
       let orderNo = 1;
@@ -760,7 +726,7 @@ const getMeetingId = (callback) => {
 
       callback(null, newCode);
     });
-  });
+  
 };
 
 const insertBooking = (
@@ -804,12 +770,10 @@ const insertBooking = (
 
   baseQuery += ` AND callDisabled IS NULL`;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+ 
 
-    connection.query(baseQuery, dbValues, (selectErr, results) => {
+    db.query(baseQuery, dbValues, (selectErr, results) => {
       if (selectErr) {
-        connection.release();
         return callback(selectErr);
       }
 
@@ -825,17 +789,16 @@ const insertBooking = (
           ", "
         )}) VALUES (${placeholders})`;
 
-        connection.query(insertQuery, values, (insertErr, result) => {
-          connection.release();
+        db.query(insertQuery, values, (insertErr, result) => {
+          
           if (insertErr) return callback(insertErr);
           return callback(null, result.insertId);
         });
       } else {
-        connection.release();
         return callback(null, false); // same as `return false` in PHP
       }
     });
-  });
+  
 };
 
 const updateBooking = (bookingId, updateData, callback) => {
@@ -845,19 +808,13 @@ const updateBooking = (bookingId, updateData, callback) => {
   const query = `UPDATE tbl_booking SET ${setClause} WHERE id = ?`;
   values.push(bookingId);
 
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("Update Booking Error for ID", id, err); // DEBUG LOG
-      console.log("Data tried to update:", data);
-      return callback(err);
-    }
+  
 
-    connection.query(query, values, (error, result) => {
-      connection.release();
+    db.query(query, values, (error, result) => {
       if (error) return callback(error);
       callback(null, result.affectedRows > 0);
     });
-  });
+  
 };
 
 const getConsultantId = (bookingId, callback) => {
@@ -881,16 +838,15 @@ const getConsultantId = (bookingId, callback) => {
 
   query += " ORDER BY tb.id DESC";
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(query, params, (error, results) => {
-      connection.release();
+    db.query(query, params, (error, results) => {
+      
       if (error) return callback(error);
 
       callback(null, bookingId ? results[0] : results);
     });
-  });
+  
 };
 
 const insertAddCallRequest = (data, callback) => {
@@ -900,10 +856,9 @@ const insertAddCallRequest = (data, callback) => {
     VALUES (?, ?, ?, ?, ?)
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+ 
 
-    connection.query(
+    db.query(
       query,
       [
         data.bookingId,
@@ -913,13 +868,12 @@ const insertAddCallRequest = (data, callback) => {
         data.addedon,
       ],
       (error, result) => {
-        connection.release();
         if (error) return callback(error);
 
         callback(null, result.insertId);
       }
     );
-  });
+  
 };
 
 const insertExternalCall = (data, callback) => {
@@ -929,10 +883,9 @@ const insertExternalCall = (data, callback) => {
     VALUES (?, ?, ?, ?, ?)
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+ 
 
-    connection.query(
+    db.query(
       query,
       [
         data.fld_booking_id,
@@ -942,13 +895,12 @@ const insertExternalCall = (data, callback) => {
         data.fld_added_on,
       ],
       (error, result) => {
-        connection.release();
         if (error) return callback(error);
 
         callback(null, result.insertId);
       }
     );
-  });
+  
 };
 
 const insertBookingHistory = (data, callback) => {
@@ -961,16 +913,15 @@ const insertBookingHistory = (data, callback) => {
     VALUES (${placeholders})
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(query, values, (error, result) => {
-      connection.release();
+    db.query(query, values, (error, result) => {
+      
       if (error) return callback(error);
 
       callback(null, result.insertId);
     });
-  });
+  
 };
 
 const insertBookingStatusHistory = (data, callback) => {
@@ -981,16 +932,15 @@ const insertBookingStatusHistory = (data, callback) => {
     ", "
   )}) VALUES (${placeholders})`;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(query, values, (error, result) => {
-      connection.release();
+    db.query(query, values, (error, result) => {
+      
       if (error) return callback(error);
 
       callback(null, result.insertId);
     });
-  });
+  
 };
 
 const getAdmin = (adminId, adminType, callback) => {
@@ -1002,16 +952,15 @@ const getAdmin = (adminId, adminType, callback) => {
     params.push(adminType);
   }
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(query, params, (error, results) => {
-      connection.release();
+    db.query(query, params, (error, results) => {
+      
       if (error) return callback(error);
 
       callback(null, results[0]);
     });
-  });
+  
 };
 
 const getAdminById = (adminId, callback) => {
@@ -1019,11 +968,10 @@ const getAdminById = (adminId, callback) => {
 
   const query = "SELECT * FROM tbl_admin WHERE id = ?";
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(query, [adminId], (error, results) => {
-      connection.release();
+
+    db.query(query, [adminId], (error, results) => {
+      
       if (error) return callback(error);
 
       if (results.length > 0) {
@@ -1032,7 +980,7 @@ const getAdminById = (adminId, callback) => {
         callback(null, null); // No admin found
       }
     });
-  });
+  
 };
 
 const insertUser = (data, email, name, verifyCode, callback) => {
@@ -1040,33 +988,31 @@ const insertUser = (data, email, name, verifyCode, callback) => {
     return callback(null, false);
   }
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     // Check if user already exists
     const checkQuery = "SELECT id FROM tbl_user WHERE fld_email = ?";
-    connection.query(checkQuery, [email], (checkErr, checkResults) => {
+    db.query(checkQuery, [email], (checkErr, checkResults) => {
       if (checkErr) {
-        connection.release();
         return callback(checkErr);
       }
 
       if (checkResults.length === 0) {
         // Insert new user
         const insertQuery = "INSERT INTO tbl_user SET ?";
-        connection.query(insertQuery, data, (insertErr, insertResult) => {
-          connection.release();
+        db.query(insertQuery, data, (insertErr, insertResult) => {
+          
           if (insertErr) return callback(insertErr);
 
           return callback(null, insertResult.insertId);
         });
       } else {
         // Return existing user ID
-        connection.release();
+        
         return callback(null, checkResults[0].id);
       }
     });
-  });
+  
 };
 
 const updateRcCallRequestSts = (
@@ -1079,17 +1025,13 @@ const updateRcCallRequestSts = (
     return callback(null, false);
   }
 
-  db.getConnection((mainErr, mainConn) => {
-    if (mainErr) {
-      console.error("Main DB connection error:", mainErr);
-      return callback(mainErr, null);
-    }
+  
 
-    mainConn.query(
+    db.query(
       `UPDATE tbl_rc_call_booking_request SET call_request_sts = ? WHERE id = ?`,
       [status, callRequestId],
       async (mainQueryErr) => {
-        mainConn.release();
+        
 
         if (mainQueryErr) {
           console.error("Main DB update error:", mainQueryErr);
@@ -1115,7 +1057,7 @@ const updateRcCallRequestSts = (
         }
       }
     );
-  });
+
 };
 
 const getRcCallBookingRequestById = (id, callback) => {
@@ -1123,8 +1065,7 @@ const getRcCallBookingRequestById = (id, callback) => {
     return callback(new Error("Invalid ID provided"));
   }
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+ 
 
     const sql = `
       SELECT 
@@ -1140,12 +1081,12 @@ const getRcCallBookingRequestById = (id, callback) => {
       LIMIT 1
     `;
 
-    connection.query(sql, [id], (error, results) => {
-      connection.release();
+    db.query(sql, [id], (error, results) => {
+      
       if (error) return callback(error);
       return callback(null, results[0] || null);
     });
-  });
+  
 };
 
 const getPostsaleCompletedCalls = (email, milestone_id, callback) => {
@@ -1157,14 +1098,10 @@ const getPostsaleCompletedCalls = (email, milestone_id, callback) => {
       AND fld_rc_milestoneid = ?
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("DB connection error:", err);
-      return callback(err, null);
-    }
+  
 
-    connection.query(query, [email, milestone_id], (error, results) => {
-      connection.release();
+    db.query(query, [email, milestone_id], (error, results) => {
+      
       if (error) {
         console.error("Query error (completed calls):", error);
         return callback(error, null);
@@ -1172,12 +1109,11 @@ const getPostsaleCompletedCalls = (email, milestone_id, callback) => {
 
       return callback(null, results[0]);
     });
-  });
+  
 };
 
 const getBookingById = (bookingId, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err, null);
+  
 
     const query = `
       SELECT 
@@ -1202,37 +1138,31 @@ const getBookingById = (bookingId, callback) => {
       WHERE b.id = ?
     `;
 
-    connection.query(query, [bookingId], (err, results) => {
-      connection.release();
+    db.query(query, [bookingId], (err, results) => {
+      
       callback(err, results);
     });
-  });
+  
 };
 
 const getBookingRowById = (bookingId, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err, null);
+  
 
     const query = `SELECT * FROM tbl_booking WHERE id = ?`;
 
-    connection.query(query, [bookingId], (err, results) => {
-      connection.release();
+    db.query(query, [bookingId], (err, results) => {
+      
       if (err) return callback(err, null);
       callback(null, results[0] || null);
     });
-  });
+  
 };
 
 const deleteBookingById = (bookingId, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("DB connection error:", err);
-      return callback(err, null);
-    }
+  
 
     const query = "DELETE FROM tbl_booking WHERE id = ?";
-    connection.query(query, [bookingId], (error, result) => {
-      connection.release(); // always release connection after use
+    db.query(query, [bookingId], (error, result) => {
 
       if (error) {
         console.error("Delete query error:", error);
@@ -1241,7 +1171,7 @@ const deleteBookingById = (bookingId, callback) => {
 
       callback(null, result);
     });
-  });
+  
 };
 
 const getAllCrmIds = (callback) => {
@@ -1251,18 +1181,17 @@ const getAllCrmIds = (callback) => {
     WHERE fld_admin_type = 'EXECUTIVE' AND status = 'Active'
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(query, (error, results) => {
-      connection.release();
+    db.query(query, (error, results) => {
+    
 
       if (error) return callback(error);
 
       const crmIds = results[0]?.crmids || "";
       callback(null, crmIds);
     });
-  });
+  
 };
 
 const getBookingData = (params, callback) => {
@@ -1322,12 +1251,11 @@ const getBookingData = (params, callback) => {
     ORDER BY tbl_booking.id DESC
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     try {
-      connection.query(query, values, (error, results) => {
-        connection.release();
+      db.query(query, values, (error, results) => {
+       
         if (error) return callback(error);
 
         if (bookingId) {
@@ -1337,10 +1265,9 @@ const getBookingData = (params, callback) => {
         }
       });
     } catch (error) {
-      connection.release();
       callback(error);
     }
-  });
+  
 };
 
 const getOtherBookingData = (params, callback) => {
@@ -1405,26 +1332,24 @@ const getOtherBookingData = (params, callback) => {
     ORDER BY tbl_booking.id DESC
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+
 
     try {
-      connection.query(query, values, (error, results) => {
-        connection.release();
+      db.query(query, values, (error, results) => {
+        
         if (error) return callback(error);
 
         callback(null, results || []);
       });
     } catch (error) {
-      connection.release();
+      
       callback(error);
     }
-  });
+  
 };
 
 const submitReassignComment = (bookingid, reassign_comment, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     // Step 1: Update booking table
     const updateQuery = `
@@ -1433,12 +1358,11 @@ const submitReassignComment = (bookingid, reassign_comment, callback) => {
       WHERE id = ?
     `;
 
-    connection.query(
+    db.query(
       updateQuery,
       [reassign_comment, bookingid],
       (err, result) => {
         if (err) {
-          connection.release();
           return callback(err);
         }
 
@@ -1449,12 +1373,11 @@ const submitReassignComment = (bookingid, reassign_comment, callback) => {
         VALUES (?, ?, 'SUPERADMIN', 1, CURDATE())
       `;
 
-        connection.query(
+        db.query(
           insertHistoryQuery,
           [bookingid, comment],
           (err, result2) => {
             if (err) {
-              connection.release();
               return callback(err);
             }
 
@@ -1465,9 +1388,8 @@ const submitReassignComment = (bookingid, reassign_comment, callback) => {
           WHERE id = ?
         `;
 
-            connection.query(selectBookingQuery, [bookingid], (err, rows) => {
+            db.query(selectBookingQuery, [bookingid], (err, rows) => {
               if (err) {
-                connection.release();
                 return callback(err);
               }
 
@@ -1482,11 +1404,10 @@ const submitReassignComment = (bookingid, reassign_comment, callback) => {
               WHERE id = ? AND call_id = ?
             `;
 
-                connection.query(
+                db.query(
                   updateRCQuery,
                   [fld_rc_call_request_id, fld_call_request_id],
                   (err, finalRes) => {
-                    connection.release();
                     if (err) return callback(err);
                     return callback(
                       null,
@@ -1495,7 +1416,6 @@ const submitReassignComment = (bookingid, reassign_comment, callback) => {
                   }
                 );
               } else {
-                connection.release();
                 return callback(
                   null,
                   "Reassign comment added (no RC update required)"
@@ -1506,12 +1426,11 @@ const submitReassignComment = (bookingid, reassign_comment, callback) => {
         );
       }
     );
-  });
+  
 };
 
 const getExternalCallInfo = (id = 0, bookingId = 0, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     try {
       let query = `SELECT * FROM tbl_external_calls WHERE 1=1`;
@@ -1529,8 +1448,8 @@ const getExternalCallInfo = (id = 0, bookingId = 0, callback) => {
 
       query += ` ORDER BY id DESC LIMIT 1`;
 
-      connection.query(query, params, (error, results) => {
-        connection.release();
+      db.query(query, params, (error, results) => {
+      
 
         if (error) return callback(error);
         if (results.length > 0) {
@@ -1540,10 +1459,9 @@ const getExternalCallInfo = (id = 0, bookingId = 0, callback) => {
         }
       });
     } catch (error) {
-      connection.release();
       callback(error);
     }
-  });
+  
 };
 
 const updateExternalCallsStatus = (bookingId, updateData, callback) => {
@@ -1555,8 +1473,7 @@ const updateExternalCallsStatus = (bookingId, updateData, callback) => {
     return callback(new Error("Invalid bookingId or updateData"));
   }
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     try {
       const fields = Object.keys(updateData);
@@ -1566,16 +1483,15 @@ const updateExternalCallsStatus = (bookingId, updateData, callback) => {
       const query = `UPDATE tbl_external_calls SET ${setClause} WHERE fld_booking_id = ?`;
       values.push(bookingId);
 
-      connection.query(query, values, (error, results) => {
-        connection.release();
+      db.query(query, values, (error, results) => {
+       
         if (error) return callback(error);
         callback(null, results);
       });
     } catch (error) {
-      connection.release();
       callback(error);
     }
-  });
+  
 };
 
 const getFullBookingData = (bookingId, callback) => {
@@ -1583,8 +1499,7 @@ const getFullBookingData = (bookingId, callback) => {
     return callback(new Error("Invalid bookingId"), null);
   }
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err, null);
+ 
 
     try {
       const query = `
@@ -1600,37 +1515,34 @@ const getFullBookingData = (bookingId, callback) => {
         WHERE b.id = ?
       `;
 
-      connection.query(query, [bookingId], (error, results) => {
-        connection.release();
+      db.query(query, [bookingId], (error, results) => {
+        
         if (error) return callback(error, null);
         callback(null, results[0] || null);
       });
     } catch (error) {
-      connection.release();
       callback(error, null);
     }
-  });
+  
 };
 
 const getExternalCallCountByBookingId = (bookingId, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     try {
       const query = `SELECT COUNT(*) AS totalrow FROM tbl_external_calls WHERE fld_booking_id = ?`;
 
-      connection.query(query, [bookingId], (error, results) => {
-        connection.release();
+      db.query(query, [bookingId], (error, results) => {
+        
 
         if (error) return callback(error);
         const count = results[0]?.totalrow || 0;
         callback(null, count);
       });
     } catch (error) {
-      connection.release();
       callback(error);
     }
-  });
+  
 };
 
 const getBookingStatusHistory = (bookingId, status, callback) => {
@@ -1638,15 +1550,13 @@ const getBookingStatusHistory = (bookingId, status, callback) => {
     SELECT * FROM tbl_booking_sts_history WHERE fld_booking_id = ? AND status = ? ORDER BY id DESC
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
 
-    connection.query(sql, [bookingId, status], (queryErr, results) => {
-      connection.release();
+    db.query(sql, [bookingId, status], (queryErr, results) => {
+      
       if (queryErr) return callback(queryErr);
       return callback(null, results);
     });
-  });
+  
 };
 
 const getAllClientBookings = (clientId, callback) => {
@@ -1675,15 +1585,14 @@ const getAllClientBookings = (clientId, callback) => {
     ORDER BY tbl_booking.id DESC
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+ 
 
-    connection.query(query, [clientId], (error, results) => {
-      connection.release();
+    db.query(query, [clientId], (error, results) => {
+      
       if (error) return callback(error);
       callback(null, results || []);
     });
-  });
+  
 };
 
 const getLatestCompletedBooking = (consultantId, email, callback) => {
@@ -1697,15 +1606,14 @@ const getLatestCompletedBooking = (consultantId, email, callback) => {
     ORDER BY id DESC LIMIT 1
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(sql, [consultantId, email], (queryErr, results) => {
-      connection.release();
+    db.query(sql, [consultantId, email], (queryErr, results) => {
+      
       if (queryErr) return callback(queryErr);
       callback(null, results);
     });
-  });
+  
 };
 
 const getLatestCompletedBookingStatusHistory = (
@@ -1722,15 +1630,14 @@ const getLatestCompletedBookingStatusHistory = (
     LIMIT 1
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(sql, [bookingId, status], (queryErr, results) => {
-      connection.release();
+    db.query(sql, [bookingId, status], (queryErr, results) => {
+      
       if (queryErr) return callback(queryErr);
       return callback(null, results);
     });
-  });
+  
 };
 
 const getLatestCompletedBookingHistory = (bookingId, callback) => {
@@ -1754,15 +1661,14 @@ const getLatestCompletedBookingHistory = (bookingId, callback) => {
     LIMIT 1
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
-    connection.query(sql, [bookingId], (queryErr, results) => {
-      connection.release();
+    db.query(sql, [bookingId], (queryErr, results) => {
+      
       if (queryErr) return callback(queryErr);
       return callback(null, results);
     });
-  });
+  
 };
 
 const checkConflictingBookings = (
@@ -2041,14 +1947,13 @@ const fetchSummaryBookings = (
     }
   };
 
-  const executeQuery = (conn) => {
+  const executeQuery = () => {
     buildFilters();
 
     // If pagination is needed, get total count first
     if (type === "all") {
-      conn.query(countSql, countParams, (countErr, countResults) => {
+      db.query(countSql, countParams, (countErr, countResults) => {
         if (countErr) {
-          conn.release();
           return callback(countErr);
         }
 
@@ -2056,8 +1961,8 @@ const fetchSummaryBookings = (
         const totalPages = Math.ceil(totalRecords / limit);
 
         // Execute main query
-        conn.query(sql, params, (err, results) => {
-          conn.release();
+        db.query(sql, params, (err, results) => {
+          
           if (err) return callback(err);
 
           const paginationData = {
@@ -2081,8 +1986,8 @@ const fetchSummaryBookings = (
       });
     } else {
       // Non-paginated query
-      conn.query(sql, params, (err, results) => {
-        conn.release();
+      db.query(sql, params, (err, results) => {
+        
         if (err) return callback(err);
 
         if (results.length > 0) {
@@ -2098,10 +2003,10 @@ const fetchSummaryBookings = (
     }
   };
 
-  const handleUserTypeAccess = (connection) => {
+  const handleUserTypeAccess = () => {
     // Handle SUPERADMIN access - has access to all bookings
     if (userType === "SUPERADMIN") {
-      executeQuery(connection);
+      executeQuery();
     }
     // Handle SUBADMIN access based on teams and subadmin type
     else if (userType === "SUBADMIN" && assignedTeam) {
@@ -2118,15 +2023,14 @@ const fetchSummaryBookings = (
             .join(" OR ");
           const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
 
-          connection.query(adminQuery, teamIds, (err, adminRows) => {
+          db.query(adminQuery, teamIds, (err, adminRows) => {
             if (err) {
-              connection.release();
               return callback(err);
             }
 
             const consultantIds = adminRows.map((row) => row.id);
             if (consultantIds.length === 0) {
-              connection.release();
+              
               return callback(null, []);
             }
 
@@ -2136,7 +2040,7 @@ const fetchSummaryBookings = (
             params.push(...consultantIds);
             countParams.push(...consultantIds);
 
-            executeQuery(connection);
+            executeQuery();
           });
         } else {
           const consultantCondition = ` AND b.fld_consultantid = ?`;
@@ -2144,7 +2048,7 @@ const fetchSummaryBookings = (
           countSql += consultantCondition;
           params.push(userId);
           countParams.push(userId);
-          executeQuery(connection);
+          executeQuery();
         }
       } else {
         // Other SUBADMINs: fetch bookings added by them or their team members
@@ -2154,9 +2058,8 @@ const fetchSummaryBookings = (
             .join(" OR ");
           const adminQuery = `SELECT id FROM tbl_admin a WHERE ${placeholders}`;
 
-          connection.query(adminQuery, teamIds, (err, adminRows) => {
+          db.query(adminQuery, teamIds, (err, adminRows) => {
             if (err) {
-              connection.release();
               return callback(err);
             }
 
@@ -2164,7 +2067,6 @@ const fetchSummaryBookings = (
             const uniqueUserIds = [...new Set([...adminIds, userId])];
 
             if (uniqueUserIds.length === 0) {
-              connection.release();
               return callback(null, []);
             }
 
@@ -2175,7 +2077,7 @@ const fetchSummaryBookings = (
             params.push(...uniqueUserIds, ...uniqueUserIds);
             countParams.push(...uniqueUserIds, ...uniqueUserIds);
 
-            executeQuery(connection);
+            executeQuery();
           });
         } else {
           const condition = ` AND (b.fld_consultantid = ? OR b.fld_addedby = ?)`;
@@ -2183,7 +2085,7 @@ const fetchSummaryBookings = (
           countSql += condition;
           params.push(userId, userId);
           countParams.push(userId, userId);
-          executeQuery(connection);
+          executeQuery();
         }
       }
     }
@@ -2194,7 +2096,7 @@ const fetchSummaryBookings = (
       countSql += condition;
       params.push(userId, "Consultant Assigned", "Postponed");
       countParams.push(userId, "Consultant Assigned", "Postponed");
-      executeQuery(connection);
+      executeQuery();
     }
     // Handle EXECUTIVE access
     else if (userType === "EXECUTIVE") {
@@ -2203,21 +2105,20 @@ const fetchSummaryBookings = (
       countSql += condition;
       params.push(userId);
       countParams.push(userId);
-      executeQuery(connection);
+      executeQuery();
     }
     // Fallback - no access
     else {
       const noAccessCondition = ` AND 1 = 0`;
       sql += noAccessCondition;
       countSql += noAccessCondition;
-      executeQuery(connection);
+      executeQuery();
     }
   };
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
-    handleUserTypeAccess(connection);
-  });
+  
+    handleUserTypeAccess();
+
 };
 
 const getBookingByOtpUrl = (bookingId, verifyOtpUrl, callback) => {

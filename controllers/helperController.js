@@ -261,11 +261,7 @@ const getConsultantsBySubjectArea = (req, res) => {
     return res.status(400).json({ message: "Subject area is required" });
   }
 
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("DB connection error:", err);
-      return res.status(500).json({ message: "Database connection error" });
-    }
+  
 
     // Step 1: Get consultantId from tbl_domain_pref
     const query1 = `
@@ -275,15 +271,14 @@ const getConsultantsBySubjectArea = (req, res) => {
       LIMIT 1
     `;
 
-    connection.query(query1, [subject_area.trim()], (error1, domainRows) => {
+    db.query(query1, [subject_area.trim()], (error1, domainRows) => {
       if (error1) {
-        connection.release();
         console.error("Query error:", error1);
         return res.status(500).json({ message: "Query error" });
       }
 
       if (!domainRows.length || !domainRows[0].cosultantId) {
-        connection.release();
+        
         return res
           .status(404)
           .json({ message: "No consultants found for this subject area" });
@@ -297,7 +292,7 @@ const getConsultantsBySubjectArea = (req, res) => {
         .filter(Boolean);
 
       if (nameArray.length === 0) {
-        connection.release();
+        
         return res.status(404).json({ message: "No valid consultants listed" });
       }
 
@@ -312,8 +307,8 @@ const getConsultantsBySubjectArea = (req, res) => {
         AND status = 'Active'
       `;
 
-      connection.query(query2, nameArray, (error2, consultants) => {
-        connection.release();
+      db.query(query2, nameArray, (error2, consultants) => {
+        
 
         if (error2) {
           console.error("Consultant query error:", error2);
@@ -336,7 +331,7 @@ const getConsultantsBySubjectArea = (req, res) => {
         return res.json(formatted);
       });
     });
-  });
+  
 };
 
 const fetchBookingDetailsWithRc = (req, res) => {

@@ -14,8 +14,7 @@ const getRcCallBookingRequest = (params, callback) => {
     status
   } = params;
 
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     let sql = `
       SELECT 
@@ -67,8 +66,7 @@ const getRcCallBookingRequest = (params, callback) => {
 
     sql += ' ORDER BY tbl_rc_call_booking_request.id DESC';
 
-    connection.query(sql, values, (error, results) => {
-      connection.release();
+    db.query(sql, values, (error, results) => {
       if (error) return callback(error);
       if (id && Number(id) > 0) {
         return callback(null, results[0] || null);
@@ -76,7 +74,7 @@ const getRcCallBookingRequest = (params, callback) => {
         return callback(null, results);
       }
     });
-  });
+  
 };
 
 
@@ -137,8 +135,7 @@ const getRcCallBookingRequest = (params, callback) => {
 
 const viewExternalCalls = async ({ session_user_id, session_user_type, bookingid }) => {
   return new Promise((resolve, reject) => {
-    db.getConnection((err, connection) => {
-      if (err) return reject(err);
+    
 
       let sql = `
         SELECT 
@@ -182,8 +179,8 @@ const viewExternalCalls = async ({ session_user_id, session_user_type, bookingid
       sql += conditions.length > 0 ? ` WHERE ${conditions.join(' AND ')}` : '';
       sql += ' ORDER BY tbl_external_calls.id DESC';
 
-      connection.query(sql, values, (error, results) => {
-        connection.release();
+      db.query(sql, values, (error, results) => {
+        
         if (error) return reject(error);
         if (bookingid) {
           return resolve(results[0] || null);
@@ -191,13 +188,12 @@ const viewExternalCalls = async ({ session_user_id, session_user_type, bookingid
           return resolve(results || []);
         }
       });
-    });
+    
   });
 };
 
 const getExternalCallByBookingId = (bookingid, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     let sql = `
       SELECT 
@@ -222,12 +218,12 @@ const getExternalCallByBookingId = (bookingid, callback) => {
       LIMIT 1
     `;
 
-    connection.query(sql, [bookingid], (error, results) => {
-      connection.release();
+    db.query(sql, [bookingid], (error, results) => {
+      
       if (error) return callback(error);
       callback(null, results.length ? results[0] : null);
     });
-  });
+  
 };
 
 

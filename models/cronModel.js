@@ -10,10 +10,6 @@ function getDateBefore(days = 0, format = "YYYY-MM-DD") {
   return moment().tz("Asia/Kolkata").subtract(days, "days").format(format);
 }
 const getAbsentConsultantsCallScheduledBookings = (callback) => {
-  db.getConnection((err, connection) => {
-    if (err) {
-      return callback(err, null);
-    }
 
     const today = getCurrentDate("YYYY-MM-DD");
     const nowTime = getCurrentDate("HH:mm:ss"); // current time in 24hr
@@ -47,22 +43,19 @@ const getAbsentConsultantsCallScheduledBookings = (callback) => {
         AND a.attendance = 'ABSENT'
     `;
 
-    connection.query(sql, [today, nowTime], (error, results) => {
-      connection.release();
+    db.query(sql, [today, nowTime], (error, results) => {
+      
       if (error) {
         return callback(error, null);
       }
       return callback(null, results);
     });
-  });
+  
 };
 
 //get acll within 30 mins
 const getUpcomingBookings = (callback) => {
-  db.getConnection((err, connection) => {
-    if (err) {
-      return callback(err, null);
-    }
+  
 
     const currentDate = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
     const startTime = moment().tz("Asia/Kolkata").format("hh:mm A"); // 03:00 PM
@@ -79,14 +72,14 @@ const getUpcomingBookings = (callback) => {
       AND fld_call_related_to != 'direct_call'
     `;
 
-    connection.query(sql, [currentDate, startTime, endTime], (error, results) => {
-      connection.release();
+    db.query(sql, [currentDate, startTime, endTime], (error, results) => {
+      
       if (error) {
         return callback(error, null);
       }
       return callback(null, results);
     });
-  });
+  
 };
 
 

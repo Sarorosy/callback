@@ -595,3 +595,5 @@
     at Sequence.end (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:83:24)
     at Sequence.OkPacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\sequences\Sequence.js:92:8)
     at Protocol._parsePacket (C:\Users\Admin\Pictures\callback\node_modules\mysql\lib\protocol\Protocol.js:291:23)
+2025-09-23 16:15:04 | ERROR | Unhandled Rejection at:
+2025-09-23 16:17:04 | ERROR | Unhandled Rejection at:

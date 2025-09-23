@@ -2,19 +2,16 @@ const db = require("../config/db");
 
 // Get call drive links
 const getCallDriveLink = (email,website, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     const sqlUser = `SELECT id FROM tbl_user WHERE fld_email = ? ORDER BY id DESC LIMIT 1`;
 
-    connection.query(sqlUser, [email], (error, userResult) => {
+    db.query(sqlUser, [email], (error, userResult) => {
       if (error) {
-        connection.release();
         return callback(error);
       }
 
       if (userResult.length === 0) {
-        connection.release();
         return callback(null, { status: false, error: "User not found" });
       }
 
@@ -27,52 +24,47 @@ const getCallDriveLink = (email,website, callback) => {
         ORDER BY id DESC
       `;
 
-      connection.query(sqlBookings, [userId, website], (err2, results) => {
-        connection.release();
+      db.query(sqlBookings, [userId, website], (err2, results) => {
+        
         if (err2) return callback(err2);
         return callback(null, { status: true, data: results });
       });
     });
-  });
+  
 };
 
 // Mark all consultants absent
 const markAsAbsentAll = (callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+ 
 
     const sql = `UPDATE tbl_admin SET attendance='ABSENT' WHERE fld_admin_type='CONSULTANT'`;
 
-    connection.query(sql, (error, results) => {
-      connection.release();
+    db.query(sql, (error, results) => {
       if (error) return callback(error);
       return callback(null, results.affectedRows > 0 
         ? "All consultants marked as ABSENT." 
         : "No consultant records were updated.");
     });
-  });
+  
 };
 
 // Mark consultant as PRESENT
 const markAsPresent = (email, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     const checkSql = `SELECT * FROM tbl_admin WHERE fld_email=? AND fld_admin_type='CONSULTANT'`;
-    connection.query(checkSql, [email], (error, result) => {
+    db.query(checkSql, [email], (error, result) => {
       if (error) {
-        connection.release();
         return callback(error);
       }
 
       if (result.length === 0) {
-        connection.release();
         return callback(null, { status: false, message: "Email not found or not a consultant" });
       }
 
       const updateSql = `UPDATE tbl_admin SET attendance='PRESENT' WHERE fld_email=?`;
-      connection.query(updateSql, [email], (err2, updateResult) => {
-        connection.release();
+      db.query(updateSql, [email], (err2, updateResult) => {
+        
         if (err2) return callback(err2);
 
         if (updateResult.affectedRows > 0) {
@@ -82,29 +74,26 @@ const markAsPresent = (email, callback) => {
         }
       });
     });
-  });
+  
 };
 
 // Mark consultant as ABSENT
 const markAsAbsent = (email, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     const checkSql = `SELECT * FROM tbl_admin WHERE fld_email=? AND fld_admin_type='CONSULTANT'`;
-    connection.query(checkSql, [email], (error, result) => {
+    db.query(checkSql, [email], (error, result) => {
       if (error) {
-        connection.release();
         return callback(error);
       }
 
       if (result.length === 0) {
-        connection.release();
         return callback(null, { status: false, message: "Email not found or not a consultant" });
       }
 
       const updateSql = `UPDATE tbl_admin SET attendance='ABSENT' WHERE fld_email=?`;
-      connection.query(updateSql, [email], (err2, updateResult) => {
-        connection.release();
+      db.query(updateSql, [email], (err2, updateResult) => {
+        
         if (err2) return callback(err2);
 
         if (updateResult.affectedRows > 0) {
@@ -114,13 +103,12 @@ const markAsAbsent = (email, callback) => {
         }
       });
     });
-  });
+  
 };
 
 // Get post sale info
 const getPostSaleInfo = (assignedId, callback) => {
-  db.getConnection((err, connection) => {
-    if (err) return callback(err);
+  
 
     const sql = `
       SELECT * FROM tbl_booking
@@ -129,12 +117,12 @@ const getPostSaleInfo = (assignedId, callback) => {
         AND fld_sale_type = 'Postsales'
     `;
 
-    connection.query(sql, [assignedId], (error, results) => {
-      connection.release();
+    db.query(sql, [assignedId], (error, results) => {
+      
       if (error) return callback(error);
       return callback(null, results);
     });
-  });
+  
 };
 
 const viewBooking = (email, callback) => {
@@ -155,14 +143,9 @@ const viewBooking = (email, callback) => {
     ORDER BY tbl_booking_overall_history.id DESC
   `;
 
-  db.getConnection((err, connection) => {
-    if (err) {
-      console.error("Error getting DB connection:", err);
-      return callback(err, null);
-    }
+  
 
-    connection.query(sql, [email], (error, results) => {
-      connection.release(); // Always release after query
+    db.query(sql, [email], (error, results) => {
 
       if (error) {
         console.error("Error executing query:", error);
@@ -175,7 +158,7 @@ const viewBooking = (email, callback) => {
         callback(null, []);
       }
     });
-  });
+  
 };
 
 module.exports = {
