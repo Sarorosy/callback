@@ -9,79 +9,79 @@ function getCurrentDate(format = "YYYY-MM-DD") {
 
 // Get all active teams
 const getAllActiveTeams = (callback) => {
-  
 
-    const sql = `
+
+  const sql = `
       SELECT * FROM tbl_team
       WHERE status = 'Active'
       ORDER BY fld_addedon DESC
     `;
 
-    db.query(sql, (queryErr, results) => {
-      if (queryErr) return callback(queryErr, null);
-      return callback(null, results);
-    });
+  db.query(sql, (queryErr, results) => {
+    if (queryErr) return callback(queryErr, null);
+    return callback(null, results);
+  });
 
 };
 
 // Get all teams
 const getAllTeams = (callback) => {
-  
 
-    const sql = `
+
+  const sql = `
       SELECT * FROM tbl_team
       ORDER BY fld_addedon DESC
     `;
 
-    db.query(sql, (queryErr, results) => {
-      if (queryErr) return callback(queryErr, null);
-      return callback(null, results);
-    });
-  
+  db.query(sql, (queryErr, results) => {
+    if (queryErr) return callback(queryErr, null);
+    return callback(null, results);
+  });
+
 };
 
 // Add a new team
 const addTeam = (teamData, callback) => {
 
 
-    const sql = `INSERT INTO tbl_team (fld_title, fld_addedon, status) VALUES (?, NOW(), 'Active')`;
+  const sql = `INSERT INTO tbl_team (fld_title, fld_addedon, status) VALUES (?, NOW(), 'Active')`;
 
-    db.query(sql, [teamData.team], (queryErr, result) => {
-    
-      if (queryErr) return callback(queryErr);
+  db.query(sql, [teamData.team], (queryErr, result) => {
 
-      // Return only the inserted ID
-      return callback(null, result.insertId);
-    });
-  
+    if (queryErr) return callback(queryErr);
+
+    // Return only the inserted ID
+    return callback(null, result.insertId);
+  });
+
 };
 
 
 // Update team title
 const updateTeam = (id, teamData, callback) => {
-  
 
-    const sql = `UPDATE tbl_team SET fld_title = ? WHERE id = ?`;
 
-    db.query(sql, [teamData.team, id], (queryErr, result) => {
-      
-      if (queryErr) return callback(queryErr);
-      return callback(null, result);
-    });
-  
+  const sql = `UPDATE tbl_team SET fld_title = ? WHERE id = ?`;
+
+  db.query(sql, [teamData.team, id], (queryErr, result) => {
+
+    if (queryErr) return callback(queryErr);
+    return callback(null, result);
+  });
+
 };
 
 // Update team status
 const updateTeamStatus = (teamId, status, callback) => {
 
 
-    const sql = `UPDATE tbl_team SET status = ? WHERE id = ?`;
+  const sql = `UPDATE tbl_team SET status = ? WHERE id = ?`;
 
-    db.query(sql, [status, teamId], (queryErr, result) => {
-      if (queryErr) return callback(queryErr);
-      return callback(null, result);
-    });
-  
+  db.query(sql, [status, teamId], (queryErr, result) => {
+    if (queryErr) return callback(queryErr);
+    return callback(null, result);
+  });
+
 };
 
 const getTeamById = (teamId, callback) => {
@@ -91,17 +91,17 @@ const getTeamById = (teamId, callback) => {
 
 
 
-    db.query(query, [teamId], (error, results) => {
-      
-      if (error) return callback(error);
+  db.query(query, [teamId], (error, results) => {
 
-      if (results.length > 0) {
-        callback(null, results[0]);
-      } else {
-        callback(null, null);
-      }
-    });
-  
+    if (error) return callback(error);
+
+    if (results.length > 0) {
+      callback(null, results[0]);
+    } else {
+      callback(null, null);
+    }
+  });
+
 };
 
 const getAllDomains = (callback) => {
@@ -116,17 +116,17 @@ const getAllDomains = (callback) => {
     ORDER BY id DESC
   `;
 
-  
 
-    db.query(sql, [], (error, results) => {
-      if (error) {
-        console.error("Query error (getAllDomains):", error);
-        return callback(error, null);
-      }
 
-      return callback(null, results);
-    });
-  
+  db.query(sql, [], (error, results) => {
+    if (error) {
+      console.error("Query error (getAllDomains):", error);
+      return callback(error, null);
+    }
+
+    return callback(null, results);
+  });
+
 };
 
 
@@ -138,14 +138,14 @@ const getAllSubjectAreas = (callback) => {
   `;
 
 
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error("Query error (subject areas):", error);
-        return callback(error, null);
-      }
-      return callback(null, results);
-    });
-  
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Query error (subject areas):", error);
+      return callback(error, null);
+    }
+    return callback(null, results);
+  });
+
 };
 
 const getAllActiveConsultants = (callback) => {
@@ -157,16 +157,16 @@ const getAllActiveConsultants = (callback) => {
       AND attendance = 'PRESENT'
   `;
 
- 
 
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error("Query error (consultants):", error);
-        return callback(error, null);
-      }
-      return callback(null, results);
-    });
-  
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Query error (consultants):", error);
+      return callback(error, null);
+    }
+    return callback(null, results);
+  });
+
 };
 
 const getAllActiveBothConsultants = (callback) => {
@@ -183,14 +183,14 @@ const getAllActiveBothConsultants = (callback) => {
 
 
 
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error("Query error (consultants):", error);
-        return callback(error, null);
-      }
-      return callback(null, results);
-    });
-  
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Query error (consultants):", error);
+      return callback(error, null);
+    }
+    return callback(null, results);
+  });
+
 };
 
 
@@ -210,14 +210,14 @@ const getAdmin = (type, status, callback) => {
 
 
 
-    db.query(query, params, (error, results) => {
-      if (error) {
-        console.error("Query error (getAdmin):", error);
-        return callback(error, null);
-      }
-      return callback(null, results);
-    });
-  
+  db.query(query, params, (error, results) => {
+    if (error) {
+      console.error("Query error (getAdmin):", error);
+      return callback(error, null);
+    }
+    return callback(null, results);
+  });
+
 };
 
 const getPlanDetails = (callback) => {
@@ -228,14 +228,14 @@ const getPlanDetails = (callback) => {
 
 
 
-    db.query(query, (error, results) => {
-      if (error) {
-        console.error("Query error (plans):", error);
-        return callback(error, null);
-      }
-      return callback(null, results);
-    });
-  
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Query error (plans):", error);
+      return callback(error, null);
+    }
+    return callback(null, results);
+  });
+
 };
 
 const getBookingDetailsWithRc = (id, callback) => {
@@ -250,69 +250,69 @@ const getBookingDetailsWithRc = (id, callback) => {
 `;
 
 
-    const values = [];
+  const values = [];
 
-    // If ID is provided, add condition
+  // If ID is provided, add condition
+  if (id) {
+    sql += ` AND b.id = ?`;
+    values.push(id);
+  }
+
+  sql += ` ORDER BY b.id DESC`;
+  if (!id) {
+  }
+
+  db.query(sql, values, (error, results) => {
+    if (error) return callback(error);
+
     if (id) {
-      sql += ` AND b.id = ?`;
-      values.push(id);
+      callback(null, results.length ? results[0] : null);
+    } else {
+      callback(null, results);
     }
+  });
 
-    sql += ` ORDER BY b.id DESC`;
-    if (!id) {
-    }
-
-    db.query(sql, values, (error, results) => {
-      if (error) return callback(error);
-
-      if (id) {
-        callback(null, results.length ? results[0] : null);
-      } else {
-        callback(null, results);
-      }
-    });
-  
 };
 
 const getConsultantSettingData = (consultantId, callback) => {
 
 
-    const sql = `
+  const sql = `
       SELECT * FROM tbl_consultant_setting
       WHERE fld_consultantid = ?
       ORDER BY id DESC
       LIMIT 1
     `;
 
-    db.query(sql, [consultantId], (error, results) => {
-      if (error) return callback(error);
+  db.query(sql, [consultantId], (error, results) => {
+    if (error) return callback(error);
 
-      callback(null, results.length ? results[0] : null);
-    });
-  
+    callback(null, results.length ? results[0] : null);
+  });
+
 };
 
 const getUsersByRole = (role, status, callback) => {
 
 
-    let query = "SELECT id, fld_name FROM tbl_admin WHERE fld_admin_type = ?";
-    const params = [role];
+  let query = "SELECT id, fld_name FROM tbl_admin WHERE fld_admin_type = ?";
+  const params = [role];
 
-    if (status) {
-      query += " AND status = ?";
-      params.push(status);
+  if (status) {
+    query += " AND status = ?";
+    params.push(status);
+  }
+
+  db.query(query, params, (err, results) => {
+
+    if (err) {
+      console.error("Query error:", err);
+      return callback(err);
     }
 
-    db.query(query, params, (err, results) => {
+    callback(null, results);
+  });
 
-      if (err) {
-        console.error("Query error:", err);
-        return callback(err);
-      }
-
-      callback(null, results);
-    });
-  
 };
 
 const fetchTimezones = (viewtype = "", callback) => {
@@ -344,27 +344,27 @@ const fetchTimezones = (viewtype = "", callback) => {
 
 const getBookingData = (params, callback) => {
   try {
-    
 
-      const {
-        bookingId = "",
-        consultantId = "",
-        userId = "",
-        selectedDate = "",
-        status = "",
-        orderBy = "DESC",
-        addedBy = "",
-        checkType = "",
-        selectedSlot = "",
-        callExternalAssign = "",
-        showAcceptedCall = "",
-        verifyOtpUrl = "",
-        hideSubOption = "",
-        clientId = "",
-        disabledBookingId = "",
-      } = params;
 
-      let sql = `
+    const {
+      bookingId = "",
+      consultantId = "",
+      userId = "",
+      selectedDate = "",
+      status = "",
+      orderBy = "DESC",
+      addedBy = "",
+      checkType = "",
+      selectedSlot = "",
+      callExternalAssign = "",
+      showAcceptedCall = "",
+      verifyOtpUrl = "",
+      hideSubOption = "",
+      clientId = "",
+      disabledBookingId = "",
+    } = params;
+
+    let sql = `
         SELECT 
           b.*, 
           a.fld_client_code AS admin_code, a.fld_name AS admin_name, a.fld_email AS admin_email, a.fld_profile_image, 
@@ -378,84 +378,84 @@ const getBookingData = (params, callback) => {
         WHERE b.callDisabled IS NULL
       `;
 
-      const values = [];
+    const values = [];
 
-      if (bookingId) {
-        sql += " AND b.id = ?";
-        values.push(bookingId);
-      }
+    if (bookingId) {
+      sql += " AND b.id = ?";
+      values.push(bookingId);
+    }
 
-      if (consultantId && checkType !== "CHECK_BOTH") {
-        sql += " AND b.fld_consultantid = ?";
-        values.push(consultantId);
-      }
+    if (consultantId && checkType !== "CHECK_BOTH") {
+      sql += " AND b.fld_consultantid = ?";
+      values.push(consultantId);
+    }
 
-      if (checkType === "CHECK_BOTH") {
-        sql +=
-          " AND (b.fld_consultantid = ? OR b.fld_secondary_consultant_id = ? OR b.fld_third_consultantid = ?)";
-        values.push(consultantId, consultantId, consultantId);
-      }
+    if (checkType === "CHECK_BOTH") {
+      sql +=
+        " AND (b.fld_consultantid = ? OR b.fld_secondary_consultant_id = ? OR b.fld_third_consultantid = ?)";
+      values.push(consultantId, consultantId, consultantId);
+    }
 
-      if (addedBy) {
-        sql += " AND b.fld_addedby = ?";
-        values.push(addedBy);
-      }
+    if (addedBy) {
+      sql += " AND b.fld_addedby = ?";
+      values.push(addedBy);
+    }
 
-      if (userId) {
-        sql += " AND b.fld_userid = ?";
-        values.push(userId);
-      }
+    if (userId) {
+      sql += " AND b.fld_userid = ?";
+      values.push(userId);
+    }
 
-      if (clientId) {
-        sql += " AND b.fld_client_id = ? AND b.id != ?";
-        values.push(clientId, disabledBookingId || 0);
-      }
+    if (clientId) {
+      sql += " AND b.fld_client_id = ? AND b.id != ?";
+      values.push(clientId, disabledBookingId || 0);
+    }
 
-      if (status == "Reject") {
-        sql +=
-          " AND b.fld_consultation_sts != 'Reject' AND b.fld_consultation_sts != 'Rescheduled'";
-      }
+    if (status == "Reject") {
+      sql +=
+        " AND b.fld_consultation_sts != 'Reject' AND b.fld_consultation_sts != 'Rescheduled'";
+    }
 
-      if (showAcceptedCall === "Yes") {
-        sql += " AND b.fld_consultation_sts = 'Accept'";
-      }
+    if (showAcceptedCall === "Yes") {
+      sql += " AND b.fld_consultation_sts = 'Accept'";
+    }
 
-      if (verifyOtpUrl) {
-        sql += " AND b.fld_verify_otp_url = ?";
-        values.push(verifyOtpUrl);
-      }
+    if (verifyOtpUrl) {
+      sql += " AND b.fld_verify_otp_url = ?";
+      values.push(verifyOtpUrl);
+    }
 
-      if (status === "Completed") {
-        sql += " AND b.fld_consultation_sts = 'Completed'";
-      }
+    if (status === "Completed") {
+      sql += " AND b.fld_consultation_sts = 'Completed'";
+    }
 
-      if (selectedDate) {
-        sql += " AND b.fld_booking_date = ?";
-        values.push(selectedDate);
-      }
+    if (selectedDate) {
+      sql += " AND b.fld_booking_date = ?";
+      values.push(selectedDate);
+    }
 
-      if (selectedSlot) {
-        sql += " AND b.fld_booking_slot = ?";
-        values.push(selectedSlot);
-      }
+    if (selectedSlot) {
+      sql += " AND b.fld_booking_slot = ?";
+      values.push(selectedSlot);
+    }
 
-      if (callExternalAssign) {
-        sql += " AND b.fld_call_external_assign = ?";
-        values.push(callExternalAssign);
-      }
+    if (callExternalAssign) {
+      sql += " AND b.fld_call_external_assign = ?";
+      values.push(callExternalAssign);
+    }
 
-      if (hideSubOption) {
-        sql +=
-          " AND (b.fld_consultant_another_option = 'CONSULTANT' OR b.fld_consultant_another_option IS NULL)";
-      }
+    if (hideSubOption) {
+      sql +=
+        " AND (b.fld_consultant_another_option = 'CONSULTANT' OR b.fld_consultant_another_option IS NULL)";
+    }
 
-      sql += ` ORDER BY b.id ${orderBy}`;
+    sql += ` ORDER BY b.id ${orderBy}`;
 
-      db.query(sql, values, (err, results) => {
-        if (err) return callback(err, null);
-        return callback(null, bookingId ? results[0] : results);
-      });
-    
+    db.query(sql, values, (err, results) => {
+      if (err) return callback(err, null);
+      return callback(null, bookingId ? results[0] : results);
+    });
+
   } catch (error) {
     return callback(error, null);
   }
@@ -463,18 +463,18 @@ const getBookingData = (params, callback) => {
 
 const getRcCallBookingRequest = (params, callback) => {
   try {
-  
 
-      const {
-        id = "",
-        crmId = "",
-        consultantId = "",
-        selectedDate = "",
-        selectedSlot = "",
-        status = "",
-      } = params;
 
-      let sql = `
+    const {
+      id = "",
+      crmId = "",
+      consultantId = "",
+      selectedDate = "",
+      selectedSlot = "",
+      status = "",
+    } = params;
+
+    let sql = `
         SELECT 
           r.*, 
           b.id AS bookingid, 
@@ -485,67 +485,67 @@ const getRcCallBookingRequest = (params, callback) => {
         WHERE r.reqFrom = 'RC'
       `;
 
-      const values = [];
+    const values = [];
 
-      if (crmId) {
-        sql += " AND r.crmid = ?";
-        values.push(crmId);
-      }
+    if (crmId) {
+      sql += " AND r.crmid = ?";
+      values.push(crmId);
+    }
 
-      if (id) {
-        sql += " AND r.id = ?";
-        values.push(id);
-      }
+    if (id) {
+      sql += " AND r.id = ?";
+      values.push(id);
+    }
 
-      if (selectedDate) {
-        sql += " AND r.booking_date = ?";
-        values.push(selectedDate);
-      }
+    if (selectedDate) {
+      sql += " AND r.booking_date = ?";
+      values.push(selectedDate);
+    }
 
-      if (selectedSlot) {
-        sql += " AND r.slot_time = ?";
-        values.push(selectedSlot);
-      }
+    if (selectedSlot) {
+      sql += " AND r.slot_time = ?";
+      values.push(selectedSlot);
+    }
 
-      if (consultantId) {
-        sql += " AND r.consultantid = ?";
-        values.push(consultantId);
-      }
+    if (consultantId) {
+      sql += " AND r.consultantid = ?";
+      values.push(consultantId);
+    }
 
-      if (status) {
-        sql += " AND r.call_request_sts = ?";
-        values.push(status);
-      }
+    if (status) {
+      sql += " AND r.call_request_sts = ?";
+      values.push(status);
+    }
 
-      sql += " ORDER BY r.id DESC";
+    sql += " ORDER BY r.id DESC";
 
-      db.query(sql, values, (err, results) => {
-        if (err) return callback(err, null);
-        return callback(null, id ? results[0] : results);
-      });
-    
+    db.query(sql, values, (err, results) => {
+      if (err) return callback(err, null);
+      return callback(null, id ? results[0] : results);
+    });
+
   } catch (error) {
     return callback(error, null);
   }
 };
 
 const getAdminById = (adminId, callback) => {
-  
 
-    db.query(
-      "SELECT * FROM tbl_admin WHERE id = ?",
-      [adminId],
-      (error, results) => {
-        callback(error, results[0]);
-      }
-    );
- 
+
+  db.query(
+    "SELECT * FROM tbl_admin WHERE id = ?",
+    [adminId],
+    (error, results) => {
+      callback(error, results[0]);
+    }
+  );
+
 };
 
 const getMessagesByBookingId = (bookingId, callback) => {
-  
 
-    const query = `
+
+  const query = `
         SELECT tbl_booking_chat.* , tbl_admin.fld_name as sender_name 
         FROM tbl_booking_chat
         LEFT JOIN tbl_admin ON tbl_booking_chat.fld_sender_id = tbl_admin.id
@@ -553,29 +553,29 @@ const getMessagesByBookingId = (bookingId, callback) => {
         ORDER BY tbl_booking_chat.fld_addedon ASC
       `;
 
-    db.query(query, [bookingId], (queryErr, results) => {
-     
+  db.query(query, [bookingId], (queryErr, results) => {
 
-      if (queryErr) {
-        console.error("Query error:", queryErr);
-        return callback(queryErr, null);
-      }
 
-      return callback(null, results);
-    });
-  
+    if (queryErr) {
+      console.error("Query error:", queryErr);
+      return callback(queryErr, null);
+    }
+
+    return callback(null, results);
+  });
+
 };
 
 const getMessageCount = (bookingid, callback) => {
   try {
-  
 
-      const query = `SELECT COUNT(*) AS count FROM tbl_booking_chat WHERE fld_bookingid = ?`;
-      db.query(query, [bookingid], (err, results) => {
-       
-        callback(err, results);
-      });
-    
+
+    const query = `SELECT COUNT(*) AS count FROM tbl_booking_chat WHERE fld_bookingid = ?`;
+    db.query(query, [bookingid], (err, results) => {
+
+      callback(err, results);
+    });
+
   } catch (error) {
     callback(error);
   }
@@ -583,93 +583,93 @@ const getMessageCount = (bookingid, callback) => {
 
 const insertChatMessage = (data, callback) => {
   try {
-    
 
-      const query = `INSERT INTO tbl_booking_chat SET ?`;
-      db.query(query, data, (err, results) => {
-        callback(err, results);
-      });
-    
+
+    const query = `INSERT INTO tbl_booking_chat SET ?`;
+    db.query(query, data, (err, results) => {
+      callback(err, results);
+    });
+
   } catch (error) {
     callback(error);
   }
 };
 
 const getFollowerData = (filters, callback) => {
- 
 
-    let query = "SELECT * FROM tbl_follower WHERE 1=1";
-    const params = [];
+
+  let query = "SELECT * FROM tbl_follower WHERE 1=1";
+  const params = [];
+
+  if (filters.id) {
+    query += " AND id = ?";
+    params.push(filters.id);
+  }
+  if (filters.follower_consultant_id) {
+    query += " AND follower_consultant_id = ?";
+    params.push(filters.follower_consultant_id);
+  }
+  if (filters.bookingid) {
+    query += " AND bookingid = ?";
+    params.push(filters.bookingid);
+  }
+  if (filters.consultantid) {
+    query += " AND consultantid = ?";
+    params.push(filters.consultantid);
+  }
+  if (filters.status) {
+    query += " AND status = ?";
+    params.push(filters.status);
+  }
+
+  db.query(query, params, (err, results) => {
+
+    if (err) {
+      return callback(err);
+    }
+
 
     if (filters.id) {
-      query += " AND id = ?";
-      params.push(filters.id);
+      return callback(null, results[0] || null);
+    } else {
+      return callback(null, results);
     }
-    if (filters.follower_consultant_id) {
-      query += " AND follower_consultant_id = ?";
-      params.push(filters.follower_consultant_id);
-    }
-    if (filters.bookingid) {
-      query += " AND bookingid = ?";
-      params.push(filters.bookingid);
-    }
-    if (filters.consultantid) {
-      query += " AND consultantid = ?";
-      params.push(filters.consultantid);
-    }
-    if (filters.status) {
-      query += " AND status = ?";
-      params.push(filters.status);
-    }
+  });
 
-    db.query(query, params, (err, results) => {
-
-      if (err) {
-        return callback(err);
-      }
-
-      
-      if (filters.id) {
-        return callback(null, results[0] || null);
-      } else {
-        return callback(null, results);
-      }
-    });
-  
 };
 
 const checkFollowerExists = (bookingId, followerId, callback) => {
-  
-    const sql = `SELECT id FROM tbl_follower WHERE bookingid = ? AND follower_consultant_id = ?`;
-    db.query(sql, [bookingId, followerId], (err, results) => {
-      
-      if (err) return callback(err);
-      callback(null, results.length > 0);
-    });
-  
+
+  const sql = `SELECT id FROM tbl_follower WHERE bookingid = ? AND follower_consultant_id = ?`;
+  db.query(sql, [bookingId, followerId], (err, results) => {
+
+    if (err) return callback(err);
+    callback(null, results.length > 0);
+  });
+
 };
 
 const insertFollower = (data, callback) => {
-  
-    const sql = `
+
+  const sql = `
       INSERT INTO tbl_follower (bookingid, follower_consultant_id, consultantid, addedon)
       VALUES (?, ?, ?, ?)
     `;
-    const values = [data.bookingid, data.follower_consultant_id, data.consultantid, data.addedon];
-    db.query(sql, values, (err, result) => {
-      
-      if (err) return callback(err);
-      callback(null, result.insertId);
-    });
-  
+  const values = [data.bookingid, data.follower_consultant_id, data.consultantid, data.addedon];
+  db.query(sql, values, (err, result) => {
+
+    if (err) return callback(err);
+    callback(null, result.insertId);
+  });
+
 };
 
- const getNotifications = (user, callback) => {
-      
-let sql;
-let params = [];
-      if (user.fld_admin_type.toUpperCase() === 'SUPERADMIN') {
-        sql = `
+const getNotifications = (user, callback) => {
+
+  let sql;
+  let params = [];
+  if (user.fld_admin_type.toUpperCase() === 'SUPERADMIN') {
+    sql = `
           SELECT id, fld_bookingid, fld_sender_id, fld_receiver_id, fld_message, fld_postedby, fld_view_status,
                  fld_read_status, fld_read_time, fld_addedon
           FROM tbl_booking_chat
@@ -678,8 +678,8 @@ let params = [];
           
           LIMIT 50
         `;
-      } else {
-        sql = `
+  } else {
+    sql = `
           SELECT id, fld_bookingid, fld_sender_id, fld_receiver_id, fld_message, fld_postedby, fld_view_status,
                  fld_read_status, fld_read_time, fld_addedon
           FROM tbl_booking_chat
@@ -687,40 +687,40 @@ let params = [];
           ORDER BY fld_addedon DESC
           LIMIT 50
         `;
-        params = [user.id];
-      }
+    params = [user.id];
+  }
 
-      
 
-        db.query(sql, params, (queryErr, results) => {
-          
-          if (queryErr) return callback(queryErr);
 
-          callback(null, results);
-        });
-      
-    };
+  db.query(sql, params, (queryErr, results) => {
 
-  const markAsRead = (id, callback) => {
-  
-    const readTime = getCurrentDate("YYYY-MM-DD HH:mm:ss");
-    const query = `
+    if (queryErr) return callback(queryErr);
+
+    callback(null, results);
+  });
+
+};
+
+const markAsRead = (id, callback) => {
+
+  const readTime = getCurrentDate("YYYY-MM-DD HH:mm:ss");
+  const query = `
       UPDATE tbl_booking_chat 
       SET fld_read_status = "READ", fld_read_time = ? 
       WHERE id = ?
     `;
 
-    db.query(query, [readTime, id], (err, result) => {
-       
+  db.query(query, [readTime, id], (err, result) => {
 
-      if (err) {
-        console.error("Query error:", err);
-        return callback(err);
-      }
 
-      return callback(null, result);
-    });
-  
+    if (err) {
+      console.error("Query error:", err);
+      return callback(err);
+    }
+
+    return callback(null, result);
+  });
+
 };
 
 const getSubjectAreasByConsultantName = (consultantName, callback) => {
@@ -734,9 +734,9 @@ const getSubjectAreasByConsultantName = (consultantName, callback) => {
 };
 
 const getFollowerByID = (followerId, callback) => {
-  
 
-    let sql = `
+
+  let sql = `
       SELECT 
         tbl_follower.id as followerid, 
         tbl_follower.bookingid,
@@ -766,18 +766,17 @@ const getFollowerByID = (followerId, callback) => {
       WHERE tbl_follower.id = ?
     `;
 
-    db.query(sql, [followerId], (queryErr, results) => {
-      
-      if (queryErr) return callback(queryErr, null);
-      return callback(null, results[0] || null);
-    });
-  
+  db.query(sql, [followerId], (queryErr, results) => {
+
+    if (queryErr) return callback(queryErr, null);
+    return callback(null, results[0] || null);
+  });
+
 };
 
 const getAddCallRequestByBookingId = (bookingId, callback) => {
-  
 
-    const sql = `
+  const sql = `
       SELECT 
         tbl_approve_addcall_request.*, 
         tbl_booking.fld_name AS client_name, 
@@ -801,12 +800,12 @@ const getAddCallRequestByBookingId = (bookingId, callback) => {
       LIMIT 1
     `;
 
-    db.query(sql, [bookingId], (queryErr, results) => {
-      
-      if (queryErr) return callback(queryErr, null);
-      return callback(null, results.length > 0 ? results[0] : null);
-    });
-  
+  db.query(sql, [bookingId], (queryErr, results) => {
+
+    if (queryErr) return callback(queryErr, null);
+    return callback(null, results.length > 0 ? results[0] : null);
+  });
+
 };
 
 module.exports = {

@@ -239,17 +239,26 @@ const checkConsultantTeamCondition = async (req, res) => {
 
     if (saletype !== "Presales") return res.send("call not completed");
 
-    bookingModel.checkConsultantCompletedCall(
+    const result = await bookingModel.checkConsultantCompletedCallNew(
       primaryconsultantid,
       clientemail,
       saletype,
-      login_crm_id,
-      (err, result) => {
-        if (err) return res.status(500).send("server error");
-
-        return res.send(result); // result could be 'add call', 'call not completed', or the formatted message
-      }
+      login_crm_id
     );
+    return res.send(result.message); 
+    
+    // bookingModel.checkConsultantCompletedCall(
+    //   primaryconsultantid,
+    //   clientemail,
+    //   saletype,
+    //   login_crm_id,
+    //   (err, result) => {
+    //     if (err) return res.status(500).send("server error");
+
+    //     return res.send(result);
+    //   }
+    // );
+
   } catch (error) {
     console.error("Error in checkConsultantTeamCondition:", error);
     return res.status(500).send("server error");
