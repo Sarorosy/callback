@@ -989,7 +989,7 @@ const insertBooking = (
           return callback(null, result.insertId);
         });
       } else {
-        return callback(null, false); // same as `return false` in PHP
+        return callback(null, false); 
       }
     });
   
