@@ -3506,6 +3506,43 @@ const getConsultantTeamBookings = (req, res) => {
   });
 };
 
+const updateMiniStatus = (req, res) => {
+  const { bookingId, field, value } = req.body;
+
+  // validate input
+  if (!bookingId || !field) {
+    return res.json({ status: false, message: "Booking ID and field are required" });
+  }
+
+  // allow only specific fields to be updated
+  const allowedFields = ["loopTagStatus", "commentReceived", "quoteShared"];
+  if (!allowedFields.includes(field)) {
+    return res.json({ status: false, message: "Invalid field" });
+  }
+
+  bookingModel.updateMiniStatus(bookingId, field, value, (err, result) => {
+    if (err) {
+      console.error("Update mini status error:", err);
+      return res.status(500).json({ status: false, message: "Server error" });
+    }
+
+    if (result.affectedRows > 0) {
+      const io = getIO();
+      io.emit("miniStatusUpdated", { bookingId, field, value });
+
+      return res.json({
+        status: true,
+        message: `${field} updated successfully`,
+      });
+    } else {
+      return res.json({
+        status: false,
+        message: "Booking not found",
+      });
+    }
+  });
+};
+
 module.exports = {
   fetchBookings,
   getBookingHistory,
@@ -3543,4 +3580,6 @@ module.exports = {
   fetchSummaryBookings,
   updateSubjectArea,
   getConsultantTeamBookings,
+
+  updateMiniStatus
 };

@@ -2756,6 +2756,18 @@ const getConsultantTeamBookings = (userId, callback) => {
   
 };
 
+const updateMiniStatus = (bookingId, field, value, callback) => {
+  const query = `UPDATE tbl_booking SET ${field} = ? WHERE id = ?`;
+  db.query(query, [value, bookingId], (error, result) => {
+    if (error) {
+      console.error("Update query error:", error);
+      return callback(error, null);
+    }
+    callback(null, result);
+  });
+};
+
+
 module.exports = {
   getBookings,
   getBookingHistory,
@@ -2801,4 +2813,6 @@ module.exports = {
   getBookingByOtpUrl,
   getRcCallBookingRequestById,
   getConsultantTeamBookings,
+
+  updateMiniStatus
 };

@@ -49,6 +49,9 @@ router.post("/updateSubjectArea", bookingController.updateSubjectArea);
 router.get("/getConsultantTeamBookings", bookingController.getConsultantTeamBookings);
 
 
+router.post("/updateMiniStatus", bookingController.updateMiniStatus);
+
+
 
 
 

@@ -178,7 +178,7 @@ const updateUser = (req, res) => {
         
         consultant_type,
         subadmin_type,
-        permissions: JSON.stringify(permissions || {}),
+        permissions, //permissions: JSON.stringify(permissions || {}),
       },
       (err, result) => {
         if (err) {
