@@ -450,7 +450,7 @@ const insertCallRequest = (req, res) => {
                   fld_sale_type: sale_type,
                   fld_bookingcode: meetingId,
                   fld_booking_date: formatted_booking_date,
-                  fld_que_counter: que_counter,
+                  fld_que_counter: parseInt((que_counter || "").toString().trim(), 10) || 0,
                   fld_question_data: question_data_string,
                   fld_answer_data: str_answer_data,
                   fld_addedon: getCurrentDate("YYYY-MM-DD"),
