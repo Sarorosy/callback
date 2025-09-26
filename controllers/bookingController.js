@@ -896,7 +896,7 @@ const saveCallScheduling = (req, res) => {
               }
 
               // Prepare email content
-              const otpPage = `${process.env.BASE_URL}otp/${bookingInfo.id}/${verify_otp_url}`;
+              const otpPage = `${process.env.BASE_URL}/otp/${bookingInfo.id}/${verify_otp_url}`;
               const subject = `Booking Information ${bookingInfo.fld_bookingcode} - ${process.env.WEBNAME}`;
 
               const body = `Hi ${bookingInfo.fld_name}, <br/><br/> 
