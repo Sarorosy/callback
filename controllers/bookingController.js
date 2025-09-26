@@ -496,7 +496,7 @@ const insertCallRequest = (req, res) => {
                     if (err)
                       return res.status(500).json({
                         status: false,
-                        message: "Insert booking error",
+                        message: "Insert booking error : "+ err,
                       });
 
                     if (!bookingId) {

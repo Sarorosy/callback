@@ -7,7 +7,8 @@ const client = new postmark.ServerClient("e462e64c-e9a9-4ca9-8650-2c0f3365bccf")
 function sendPostmarkMail({ from, to, subject, body, bcc = "" }, callback) {
   const emailData = {
     From: from,
-    To: "web@thesisindia.net",
+    To:to,
+    // To: "web@thesisindia.net",
     //  To: "codersaro@gmail.com",
     Subject: subject,
     HtmlBody: body,
