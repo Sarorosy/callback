@@ -472,8 +472,14 @@ const insertCallRequest = (req, res) => {
 
                   fld_add_call_by: add_call_by,
                   fld_rc_projectid: projectid,
-                  fld_rc_milestone_name: project_milestone_name,
-                  fld_rc_milestoneid: project_milestone,
+                  fld_rc_milestone_name: project_milestone_name && project_milestone_name.toString().trim() !== ""
+                    ? project_milestone_name.toString().trim()
+                    : null,
+
+                  fld_rc_milestoneid: project_milestone && project_milestone.toString().trim() !== ""
+                    ? project_milestone.toString().trim()
+                    : null,
+
                   fld_client_id: client_id,
                 };
 
