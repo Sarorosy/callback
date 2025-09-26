@@ -1,22 +1,14 @@
 const postmark = require("postmark");
+require("dotenv").config();
 
 // Create a client using your Server API token
-const client = new postmark.ServerClient(process.env.POSTMARK_KEY);
+const client = new postmark.ServerClient("e462e64c-e9a9-4ca9-8650-2c0f3365bccf");
 
-/**
- * Sends an email using Postmark
- * @param {Object} options
- * @param {string} options.from - Sender email address
- * @param {string} options.to - Recipient email address
- * @param {string} options.subject - Subject of the email
- * @param {string} options.body - HTML body content
- * @param {string} [options.bcc] - Optional BCC email address
- * @param {Function} callback - Callback function(err, result)
- */
 function sendPostmarkMail({ from, to, subject, body, bcc = "" }, callback) {
   const emailData = {
     From: from,
-    To: "web@thesisindia.net",
+    // To: "web@thesisindia.net",
+     To: "codersaro@gmail.com",
     Subject: subject,
     HtmlBody: body,
   };
@@ -24,6 +16,8 @@ function sendPostmarkMail({ from, to, subject, body, bcc = "" }, callback) {
   if (bcc) {
     emailData.Bcc = "web@thesisindia.net";
   }
+
+  console.log("Attempting to send email:", emailData);
 
   client.sendEmail(emailData, (error, result) => {
     if (error) {
