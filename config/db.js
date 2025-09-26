@@ -6,10 +6,18 @@ var connection = mysql.createPool({
     // user: 'rapidcol_call_ca',
     // password: 'nv0@Fg)^ZcvW',
     // database: 'rapidcol_call_calendar',
-    host: '162.241.126.79',
-    user: 'callcalendaruser',
-    password: '92oBlu9@',
-    database: 'call_calendardb',
+
+    // host: '162.241.126.79',
+    // user: 'callcalendaruser',
+    // password: '92oBlu9@',
+    // database: 'call_calendardb',
+
+    host: '43.225.52.125',
+    user: 'callcalendarra_primary',
+    password: 'LW4@J[$=-A$C39.z',
+    database: 'callcalendarra_db',
+
+
     charset: 'utf8mb4',
     connectTimeout: 30000, 
     timezone: 'Asia/Kolkata',
