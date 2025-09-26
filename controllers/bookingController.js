@@ -245,8 +245,8 @@ const checkConsultantTeamCondition = async (req, res) => {
       saletype,
       login_crm_id
     );
-    return res.send(result.message); 
-    
+    return res.send(result.message);
+
     // bookingModel.checkConsultantCompletedCall(
     //   primaryconsultantid,
     //   clientemail,
@@ -466,7 +466,10 @@ const insertCallRequest = (req, res) => {
                   fld_insta_website: insta_website,
                   fld_call_regarding: call_regarding,
                   fld_topic_of_research: topic_of_research,
-                  fld_consultant_another_option: consultant_another_option,
+                  fld_consultant_another_option: consultant_another_option && consultant_another_option.toString().trim() !== ""
+                    ? consultant_another_option.toString().trim()
+                    : null,
+
                   fld_add_call_by: add_call_by,
                   fld_rc_projectid: projectid,
                   fld_rc_milestone_name: project_milestone_name,
@@ -498,7 +501,7 @@ const insertCallRequest = (req, res) => {
                     if (err)
                       return res.status(500).json({
                         status: false,
-                        message: "Insert booking error : "+ err,
+                        message: "Insert booking error : " + err,
                       });
 
                     if (!bookingId) {
@@ -532,7 +535,7 @@ const insertCallRequest = (req, res) => {
                           });
                         }
 
-                        
+
                         emitAddCallRequestAdded(bookingId);
                       });
                     }
@@ -544,7 +547,7 @@ const insertCallRequest = (req, res) => {
                         call_request_id,
                         rc_call_request_id,
                         "Consultant Assigned",
-                        () => {}
+                        () => { }
                       );
                       if (call_request_id && rc_call_request_id) {
                         emitRcBookingUpdate(call_request_id);
@@ -570,9 +573,8 @@ const insertCallRequest = (req, res) => {
                         }
                       });
 
-                      const extComment = `External Call Assigned by CRM ${
-                        user?.fld_name || "CRM"
-                      } on ${getFormattedDate()} at ${getFormattedTime()}`;
+                      const extComment = `External Call Assigned by CRM ${user?.fld_name || "CRM"
+                        } on ${getFormattedDate()} at ${getFormattedTime()}`;
 
                       const extHistory = {
                         fld_booking_id: bookingId,
@@ -592,7 +594,7 @@ const insertCallRequest = (req, res) => {
                       bookingModel.updateBooking(
                         bookingId,
                         { fld_call_external_assign: "Yes" },
-                        () => {}
+                        () => { }
                       );
                     }
 
@@ -617,11 +619,9 @@ const insertCallRequest = (req, res) => {
                             return;
                           }
 
-                          const comment = `Call assigned for consultant ${
-                            consultantInfo.fld_name
-                          } by ${
-                            user?.fld_name || "Admin"
-                          }  on ${getFormattedDate()} at ${getFormattedTime()}`;
+                          const comment = `Call assigned for consultant ${consultantInfo.fld_name
+                            } by ${user?.fld_name || "Admin"
+                            }  on ${getFormattedDate()} at ${getFormattedTime()}`;
 
                           const history1 = {
                             fld_booking_id: bookingId,
@@ -667,11 +667,9 @@ const insertCallRequest = (req, res) => {
                             return;
                           }
 
-                          const comment2 = `Call assigned for consultant ${
-                            secConsultantInfo.fld_name
-                          } by ${
-                            user?.fld_name || "Admin"
-                          } on ${getFormattedDate()} at ${getFormattedTime()}`;
+                          const comment2 = `Call assigned for consultant ${secConsultantInfo.fld_name
+                            } by ${user?.fld_name || "Admin"
+                            } on ${getFormattedDate()} at ${getFormattedTime()}`;
 
                           const history2 = {
                             fld_booking_id: bookingId,
@@ -855,9 +853,8 @@ const saveCallScheduling = (req, res) => {
         if (err || !admin)
           return res.json({ status: false, message: "Consultant not found." });
 
-        const comment = `Call scheduled for consultant ${admin.fld_name} by ${
-          user?.fld_name
-        } on ${getFormattedDate()} at ${getFormattedTime()}`;
+        const comment = `Call scheduled for consultant ${admin.fld_name} by ${user?.fld_name
+          } on ${getFormattedDate()} at ${getFormattedTime()}`;
 
         const historyData = {
           fld_booking_id: bookingId,
@@ -947,9 +944,8 @@ const saveCallScheduling = (req, res) => {
                     });
                   }
 
-                  const secComment = `Call scheduled by ${
-                    admin.fld_name
-                  } for secondary consultant  on ${getFormattedDate()} at ${getFormattedTime()}`;
+                  const secComment = `Call scheduled by ${admin.fld_name
+                    } for secondary consultant  on ${getFormattedDate()} at ${getFormattedTime()}`;
 
                   const secHistory = {
                     fld_booking_id: bookingId,
@@ -1052,7 +1048,7 @@ const updateCallScheduling = (req, res) => {
           call_request_id,
           rc_call_request_id,
           "Call Rescheduled",
-          () => {}
+          () => { }
         );
       }
 
@@ -1064,8 +1060,8 @@ const updateCallScheduling = (req, res) => {
         const oldDateTimeFormatted = moment
           .tz(
             oldBookingRow.fld_booking_date +
-              " " +
-              oldBookingRow.fld_booking_slot,
+            " " +
+            oldBookingRow.fld_booking_slot,
             "YYYY-MM-DD hh:mm A",
             "Asia/Kolkata"
           )
@@ -1075,9 +1071,8 @@ const updateCallScheduling = (req, res) => {
           .tz(bookingDate + " " + slot, "YYYY-MM-DD hh:mm A", "Asia/Kolkata")
           .format("ddd DD MMM, YYYY hh:mm A");
 
-        const comment = `Call Rescheduled from ${oldDateTimeFormatted} to ${newDateTimeFormatted} by ${
-          admin.fld_name
-        }  on ${getFormattedDate()} at ${getFormattedTime()}`;
+        const comment = `Call Rescheduled from ${oldDateTimeFormatted} to ${newDateTimeFormatted} by ${admin.fld_name
+          }  on ${getFormattedDate()} at ${getFormattedTime()}`;
 
         const historyData = {
           fld_booking_id: bookingId,
@@ -1144,9 +1139,8 @@ const updateCallScheduling = (req, res) => {
                 return handleFinalResponse(); // Still send main email
               }
 
-              const secComment = `Call Rescheduled by ${
-                admin.fld_name
-              } for secondary consultant  on ${getFormattedDate()} at ${getFormattedTime()}`;
+              const secComment = `Call Rescheduled by ${admin.fld_name
+                } for secondary consultant  on ${getFormattedDate()} at ${getFormattedTime()}`;
 
               const secHistory = {
                 fld_booking_id: bookingId,
@@ -1210,22 +1204,21 @@ function sendRescheduleMail({ booking, oldDateTime, newDateTime }, callback) {
         <table style="text-align: center;">
           <tr><td style="font-weight: bold;">${newDate.format("MMM")}</td></tr>
           <tr><td style="font-size: 24px; font-weight: bold;">${newDate.format(
-            "DD"
-          )}</td></tr>
+    "DD"
+  )}</td></tr>
           <tr><td>${newDate.format("ddd")}</td></tr>
         </table>
       </td>
       <td style="padding: 20px; width: 40%;">
-        <div style="font-weight: 600; font-size: 16px;">${
-          booking.fld_call_regarding
-        }</div>
+        <div style="font-weight: 600; font-size: 16px;">${booking.fld_call_regarding
+    }</div>
         <p>
           <strong>When:</strong> <s>${oldDate.format(
-            "ddd MMM DD, YYYY hh:mm A"
-          )}</s><br/>
+      "ddd MMM DD, YYYY hh:mm A"
+    )}</s><br/>
           <strong>Updated:</strong> ${newDate.format(
-            "ddd MMM DD, YYYY hh:mm A"
-          )}<br/>
+      "ddd MMM DD, YYYY hh:mm A"
+    )}<br/>
           <strong>Timezone:</strong> ${booking.fld_timezone}
         </p>
         <p><strong>Consultant:</strong> ${consultantName}</p>
@@ -1244,37 +1237,30 @@ function sendRescheduleMail({ booking, oldDateTime, newDateTime }, callback) {
 
   <table style="border: 1px solid #e5e5e5; width: 100%; margin-top: 10px;">
     <tr>
-      <td style="padding: 20px;"><strong>Name</strong><br/>${
-        booking.user_name
-      }</td>
-      <td style="padding: 20px;"><strong>Email</strong><br/>${
-        booking.user_email
-      }</td>
-      <td style="padding: 20px;"><strong>Sale Type</strong><br/>${
-        booking.fld_sale_type
-      }</td>
+      <td style="padding: 20px;"><strong>Name</strong><br/>${booking.user_name
+    }</td>
+      <td style="padding: 20px;"><strong>Email</strong><br/>${booking.user_email
+    }</td>
+      <td style="padding: 20px;"><strong>Sale Type</strong><br/>${booking.fld_sale_type
+    }</td>
     </tr>
     <tr>
-      <td style="padding: 20px;"><strong>Topic Of Research</strong><br/>${
-        booking.fld_topic_of_research
-      }</td>
-      <td style="padding: 20px;"><strong>Call Regarding</strong><br/>${
-        booking.fld_call_regarding
-      }</td>
-      <td style="padding: 20px;"><strong>Call Joining Link</strong><br/>${
-        booking.fld_call_joining_link
-      }</td>
+      <td style="padding: 20px;"><strong>Topic Of Research</strong><br/>${booking.fld_topic_of_research
+    }</td>
+      <td style="padding: 20px;"><strong>Call Regarding</strong><br/>${booking.fld_call_regarding
+    }</td>
+      <td style="padding: 20px;"><strong>Call Joining Link</strong><br/>${booking.fld_call_joining_link
+    }</td>
     </tr>
-    ${
-      booking.fld_call_confirmation_status ===
+    ${booking.fld_call_confirmation_status ===
       "Call Confirmation Pending at Client End"
-        ? `
+      ? `
       <tr>
         <td style="padding: 20px;">
           <a href="${process.env.BASE_URL}/otp/${booking.id}/${booking.fld_verify_otp_url}" style="background-color: #fa713b; color: #fff; padding: 10px 15px; border-radius: 5px; text-decoration: none;" target="_blank">View Booking Details</a>
         </td>
       </tr>`
-        : ""
+      : ""
     }
   </table>
 
@@ -1401,9 +1387,8 @@ const setAsConverted = (req, res) => {
       if (err || !admin)
         return res.json({ status: false, message: "Admin not found." });
 
-      const comment = `Call status set as converted by ${
-        admin.fld_name
-      }  on ${getFormattedDate()} at ${getFormattedTime()}. RC Code - ${rcCode}, Project Id - ${projectId}`;
+      const comment = `Call status set as converted by ${admin.fld_name
+        }  on ${getFormattedDate()} at ${getFormattedTime()}. RC Code - ${rcCode}, Project Id - ${projectId}`;
 
       // Step 3: Insert Booking Overall History
       const historyData = {
@@ -1739,7 +1724,7 @@ async function sendConfirmationEmail(booking, res) {
           if (crm.fld_email) {
             const link = `${process.env.BASE_URL}/admin/booking_detail/${booking.id}`;
 
-        
+
             const message = `Your ${booking.fld_sale_type} request with Booking id <b>${booking.fld_bookingcode}</b> for client ${booking.fld_name} has been confirmed.<br/>
               <a href="${link}" target="_blank" class="view-task-btn">View Booking</a>`;
 
@@ -1929,9 +1914,8 @@ const reassignComment = (req, res) => {
           });
         }
 
-        const comment = `Call reassign request to another consultant by ${
-          user.fld_name
-        }  on ${getFormattedDate()} at ${getFormattedTime()}`;
+        const comment = `Call reassign request to another consultant by ${user.fld_name
+          }  on ${getFormattedDate()} at ${getFormattedTime()}`;
 
         const historyData = {
           fld_booking_id: bookingId,
@@ -2213,9 +2197,8 @@ const updateConsultationStatus = async (req, res) => {
       try {
         // Generate a unique key for Cloudflare R2
 
-        const key = `completed_file/${bookingid}/${Date.now()}-${
-          req.file.originalname
-        }`;
+        const key = `completed_file/${bookingid}/${Date.now()}-${req.file.originalname
+          }`;
         const uploadCommand = new PutObjectCommand({
           Bucket: "callcalendar",
           Key: key,
@@ -2395,18 +2378,15 @@ const updateConsultationStatus = async (req, res) => {
 
                 let comments;
                 if (isExternal && booking.fld_rc_call_request_id > 0) {
-                  comments = `External Call ${consultationStatusText} by ${
-                    user.fld_name || "Admin"
-                  } on ${getFormattedDate()} at ${getFormattedTime()}`;
+                  comments = `External Call ${consultationStatusText} by ${user.fld_name || "Admin"
+                    } on ${getFormattedDate()} at ${getFormattedTime()}`;
                 } else {
                   if (consultationStatusText === "Client did not join") {
-                    comments = `Call status updated to ${consultationStatusText} by ${
-                      consultantData.fld_name
-                    }  on ${getFormattedDate()} at ${getFormattedTime()}`;
+                    comments = `Call status updated to ${consultationStatusText} by ${consultantData.fld_name
+                      }  on ${getFormattedDate()} at ${getFormattedTime()}`;
                   } else {
-                    comments = `Call ${consultationStatusText} by ${
-                      consultantData.fld_name
-                    }  on ${getFormattedDate()} at ${getFormattedTime()}`;
+                    comments = `Call ${consultationStatusText} by ${consultantData.fld_name
+                      }  on ${getFormattedDate()} at ${getFormattedTime()}`;
                   }
                 }
 
@@ -2441,7 +2421,7 @@ const updateConsultationStatus = async (req, res) => {
               processConsultantHistory(booking.fld_secondary_consultant_id);
             }
 
-           
+
             // Send emails based on status
             handleEmailNotifications(
               booking,
@@ -2490,27 +2470,20 @@ const handleEmailNotifications = (
           (err, consultantInfo) => {
             if (err || !consultantInfo) return;
 
-            const subject = `Call ${consultation_sts} by ${
-              consultantInfo.fld_name
-            } - ${process.env.WEBNAME || "Website"}`;
+            const subject = `Call ${consultation_sts} by ${consultantInfo.fld_name
+              } - ${process.env.WEBNAME || "Website"}`;
             let body;
 
             if (consultation_sts === "Rescheduled") {
-              body = `Hi ${crmInfo.fld_name},<br/><br/>The consultant ${
-                consultantInfo.fld_name
-              } has rescheduled the call for Booking ID ${
-                booking.fld_bookingcode
-              }.<br/><br/>Thanks & Regards,<br/>Team - ${
-                process.env.WEBNAME || "Website"
-              }`;
+              body = `Hi ${crmInfo.fld_name},<br/><br/>The consultant ${consultantInfo.fld_name
+                } has rescheduled the call for Booking ID ${booking.fld_bookingcode
+                }.<br/><br/>Thanks & Regards,<br/>Team - ${process.env.WEBNAME || "Website"
+                }`;
             } else {
-              body = `Hi ${crmInfo.fld_name},<br/><br/>Call Id ${
-                booking.id
-              } ${consultation_sts} by ${
-                consultantInfo.fld_name
-              } on ${currentDate} at ${currentTime}<br/><br/>Thanks & Regards,<br/>Team - ${
-                process.env.WEBNAME || "Website"
-              }`;
+              body = `Hi ${crmInfo.fld_name},<br/><br/>Call Id ${booking.id
+                } ${consultation_sts} by ${consultantInfo.fld_name
+                } on ${currentDate} at ${currentTime}<br/><br/>Thanks & Regards,<br/>Team - ${process.env.WEBNAME || "Website"
+                }`;
             }
 
             const from =
@@ -2519,9 +2492,9 @@ const handleEmailNotifications = (
             try {
               if (crmInfo.fld_email) {
                 const link = `${process.env.BASE_URL}/admin/booking_detail/${booking.id}`;
-                let statusText=consultation_sts;
-                if(consultation_sts=="Accept" || consultation_sts=="Reject"){
-                    statusText= consultation_sts+"ed";
+                let statusText = consultation_sts;
+                if (consultation_sts == "Accept" || consultation_sts == "Reject") {
+                  statusText = consultation_sts + "ed";
                 }
                 const message = `Your ${booking.fld_sale_type} request with Booking id <b>${booking.fld_bookingcode}</b> for client ${booking.fld_name} has been ${statusText}.<br/> 
 <a href="${link}" target="_blank" class="view-task-btn">View Booking</a>`;
@@ -2607,14 +2580,11 @@ const handleAcceptedBookingNotification = (bookingInfo) => {
     const otpPageUrl = `${process.env.BASE_URL}/otp/${bookingInfo.id}/${verifyOtpUrl}`;
 
     // Send email to client
-    const subject = `Booking Information ${bookingInfo.fld_bookingcode} - ${
-      process.env.WEBNAME || "Website"
-    }`;
-    const body = `Hi ${
-      bookingInfo.user_name
-    },<br/><br/>Your call is scheduled with one of the experts to discuss about your research work. Please click on the button below to view the booking details<br/><br/><a href="${otpPageUrl}" style="color: #fff;background-color: #fa713b;border-radius:5px;padding:10px 15px;" target="_blank">View Booking Details</a><br/><br/>Thanks & Regards,<br/>Team - ${
-      process.env.WEBNAME || "Website"
-    }`;
+    const subject = `Booking Information ${bookingInfo.fld_bookingcode} - ${process.env.WEBNAME || "Website"
+      }`;
+    const body = `Hi ${bookingInfo.user_name
+      },<br/><br/>Your call is scheduled with one of the experts to discuss about your research work. Please click on the button below to view the booking details<br/><br/><a href="${otpPageUrl}" style="color: #fff;background-color: #fa713b;border-radius:5px;padding:10px 15px;" target="_blank">View Booking Details</a><br/><br/>Thanks & Regards,<br/>Team - ${process.env.WEBNAME || "Website"
+      }`;
 
     const from = process.env.MAIL_FROM || "donotreply@rapidcollaborate.com";
 
@@ -2644,15 +2614,11 @@ const handleRejectedOrRescheduledNotification = (bookingInfo, status) => {
       .format("DD MMM YYYY");
 
     const subject = `Status Updated - ${process.env.WEBNAME || "Website"}`;
-    const body = `Hi ${
-      bookingInfo.user_name
-    },<br/><br/>This is to inform you that your call which was scheduled for ${bookingDate} ${
-      bookingInfo.fld_booking_slot
-    } with ${
-      bookingInfo.admin_name
-    } has been ${callStatus}.<br/><br/>Thanks & Regards,<br/>Team - ${
-      process.env.WEBNAME || "Website"
-    }`;
+    const body = `Hi ${bookingInfo.user_name
+      },<br/><br/>This is to inform you that your call which was scheduled for ${bookingDate} ${bookingInfo.fld_booking_slot
+      } with ${bookingInfo.admin_name
+      } has been ${callStatus}.<br/><br/>Thanks & Regards,<br/>Team - ${process.env.WEBNAME || "Website"
+      }`;
 
     const from = process.env.MAIL_FROM || "donotreply@rapidcollaborate.com";
 
@@ -2810,9 +2776,8 @@ const assignExternalCall = (req, res) => {
 
           const now = moment();
 
-          const comment = `Call External assigned to consultant ${consultantName} by ${
-            admin.fld_name
-          }  on ${getFormattedDate()} at ${getFormattedTime()}`;
+          const comment = `Call External assigned to consultant ${consultantName} by ${admin.fld_name
+            }  on ${getFormattedDate()} at ${getFormattedTime()}`;
 
           // Step 4: Insert into history
           const historyData = {
@@ -3134,7 +3099,7 @@ const updateExternalConsultationStatus = (req, res) => {
               fld_comment: historyComment,
               fld_addedon: getCurrentDate("YYYY-MM-DD"),
             },
-            () => {}
+            () => { }
           );
 
           bookingModel.insertBookingStatusHistory(
@@ -3144,7 +3109,7 @@ const updateExternalConsultationStatus = (req, res) => {
               fld_comment: externalCallComnt,
               fld_call_completed_date: getCurrentDate("YYYY-MM-DD"),
             },
-            () => {}
+            () => { }
           );
 
           // If accepted, send OTP email
@@ -3188,7 +3153,7 @@ const updateExternalConsultationStatus = (req, res) => {
                         {
                           fld_message_id: result.messageid,
                         },
-                        () => {}
+                        () => { }
                       );
                     }
                     emitBookingUpdate(bookingid);
