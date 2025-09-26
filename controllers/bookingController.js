@@ -341,6 +341,8 @@ const insertCallRequest = (req, res) => {
       user,
     } = req.body;
 
+    console.log(req.body);
+
     const formatted_booking_date = booking_date
       ? moment(booking_date).format("YYYY-MM-DD")
       : null;
@@ -440,7 +442,7 @@ const insertCallRequest = (req, res) => {
                   fld_userid: insertId,
                   fld_teamid: teamId,
                   fld_consultantid: consultant_id,
-                  fld_secondary_consultant_id: secondary_consultant_id,
+                  fld_secondary_consultant_id: parseInt((secondary_consultant_id || "").toString().trim(), 10) || 0,
 
                   fld_name: name.trim(),
                   fld_email: email.trim(),
