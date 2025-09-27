@@ -100,7 +100,7 @@ const addUser = (req, res) => {
   userModel.checkUsernameExists(username, null, (err, exists) => {
     if (err) {
       console.error("DB Error:", err);
-      return res.status(500).json({ status: false, message: "Database error" });
+      return res.status(500).json({ status: false, message: "Database error " + err });
     }
 
     if (exists) {
@@ -115,7 +115,7 @@ const addUser = (req, res) => {
       email,
       
       password,
-      consultant_type,
+      consultant_type : consultant_type ?? null,
       subadmin_type,
       permissions,
     }, (err, result) => {
