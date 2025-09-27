@@ -2476,7 +2476,9 @@ const handleEmailNotifications = (
           (err, consultantInfo) => {
             if (err || !consultantInfo) return;
 
-            const subject = `Call ${consultation_sts} by ${consultantInfo.fld_name
+            let sts = consultation_sts == "Accept" ? "Accepted" : consultation_sts =="Reject" ? "Rejected" : consultation_sts;
+
+            const subject = `Call ${sts} by ${consultantInfo.fld_name
               } - ${process.env.WEBNAME || "Website"}`;
             let body;
 
@@ -2487,7 +2489,7 @@ const handleEmailNotifications = (
                 }`;
             } else {
               body = `Hi ${crmInfo.fld_name},<br/><br/>Call Id ${booking.id
-                } ${consultation_sts} by ${consultantInfo.fld_name
+                } ${sts} by ${consultantInfo.fld_name
                 } on ${currentDate} at ${currentTime}<br/><br/>Thanks & Regards,<br/>Team - ${process.env.WEBNAME || "Website"
                 }`;
             }
