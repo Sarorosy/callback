@@ -442,6 +442,7 @@ const insertCallRequest = (req, res) => {
                   fld_userid: insertId,
                   fld_teamid: teamId,
                   fld_consultantid: consultant_id,
+                  fld_consultantid: parseInt((consultant_id || "").toString().trim(), 10) || 0,
                   fld_secondary_consultant_id: parseInt((secondary_consultant_id || "").toString().trim(), 10) || 0,
 
                   fld_name: name.trim(),
