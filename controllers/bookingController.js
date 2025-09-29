@@ -566,6 +566,8 @@ const insertCallRequest = (req, res) => {
                       const extCallData = {
                         fld_booking_id: bookingId,
                         fld_call_added_by: adminId,
+                        fld_consultant_id: 0,
+                        fld_consultant_name : null,
                         fld_consultation_sts: "Pending",
                         fld_call_request_sts: "Pending",
                         fld_added_on: getCurrentDate("YYYY-MM-DD"),
