@@ -2539,14 +2539,17 @@ const buildBookingQuery = (userId, userType, subadminType, assignedTeam, filters
   buildFilterConditions();
   const userTypeResult = buildUserTypeConditions();
 
-  // Add ordering and limit
-  sql += ` ORDER BY b.id DESC`;
-  
-  if (type === "all") {
-    sql += ` LIMIT ? OFFSET ?`;
-    params.push(limit, offset);
-  } else {
-    sql += ` LIMIT 50`;
+  // IMPORTANT: Don't add ORDER BY and LIMIT here if needsTeamQuery is true
+  // They will be added after team conditions in fetchSummaryBookings
+  if (!userTypeResult.needsTeamQuery) {
+    sql += ` ORDER BY b.id DESC`;
+    
+    if (type === "all") {
+      sql += ` LIMIT ? OFFSET ?`;
+      params.push(limit, offset);
+    } else {
+      sql += ` LIMIT 50`;
+    }
   }
 
   return {
@@ -2556,7 +2559,8 @@ const buildBookingQuery = (userId, userType, subadminType, assignedTeam, filters
     countParams,
     limit,
     userTypeResult,
-    needsPagination: type === "all"
+    needsPagination: type === "all",
+    type // Pass type for later use
   };
 };
 
@@ -2614,11 +2618,21 @@ const fetchSummaryBookings = async (
           conditionParams = [...uniqueUserIds, ...uniqueUserIds];
         }
 
-        // Add the team-based condition to queries
+        // Add the team-based condition to both queries
         queryData.sql += finalCondition;
         queryData.countSql += finalCondition;
         queryData.params.push(...conditionParams);
         queryData.countParams.push(...conditionParams);
+
+        // NOW add ORDER BY and LIMIT after all WHERE conditions
+        queryData.sql += ` ORDER BY b.id DESC`;
+        
+        if (queryData.type === "all") {
+          queryData.sql += ` LIMIT ? OFFSET ?`;
+          queryData.params.push(queryData.limit, (page - 1) * queryData.limit);
+        } else {
+          queryData.sql += ` LIMIT 50`;
+        }
 
         // Execute the final queries
         executeQueries(queryData, filters, page, callback);
