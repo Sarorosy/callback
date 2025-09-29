@@ -35,7 +35,7 @@ pool.query('SELECT 1', (err) => {
 });
 
 // Cleanup idle sleepers every 1 minutes
-const cleanupInterval = 1 * 60 * 1000;
+const cleanupInterval = 30 * 1000;
 
 setInterval(() => {
     pool.query(`
