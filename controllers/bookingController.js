@@ -567,7 +567,7 @@ const insertCallRequest = (req, res) => {
                         fld_booking_id: bookingId,
                         fld_call_added_by: adminId,
                         fld_consultant_id: 0,
-                        fld_consultant_name : null,
+                        fld_consultant_name: null,
                         fld_consultation_sts: "Pending",
                         fld_call_request_sts: "Pending",
                         fld_added_on: getCurrentDate("YYYY-MM-DD"),
@@ -2383,6 +2383,7 @@ const updateConsultationStatus = async (req, res) => {
               if (!consultantId || consultantId === 0) return;
 
               bookingModel.getAdminById(consultantId, (err, consultantData) => {
+                console.log("consultant id is", consultantId)
                 if (err || !consultantData) return;
 
                 let comments;
@@ -2415,30 +2416,68 @@ const updateConsultationStatus = async (req, res) => {
             };
 
             // Process primary consultant history
-            if (
+            if (user && user.id != "") {
+
+              console.log("2420")
+              processConsultantHistory(
+                user.id,
+                booking.fld_rc_call_request_id > 0
+              );
+
+              // Send emails based on status
+
+              handleEmailNotifications(
+                booking,
+                new_consultation_sts,
+                currentDate,
+                currentTime,
+                req,
+                "crm"
+              );
+            }
+            else if (
               booking.fld_secondary_consultant_id === 0 &&
               booking.fld_consultantid
             ) {
+              console.log("2430")
               processConsultantHistory(
                 booking.fld_consultantid,
                 booking.fld_rc_call_request_id > 0
+              );
+
+              // Send emails based on status
+
+              handleEmailNotifications(
+                booking,
+                new_consultation_sts,
+                currentDate,
+                currentTime,
+                req,
+                "consultant"
               );
             }
 
             // Process secondary consultant history
             if (booking.fld_secondary_consultant_id > 0) {
+              console.log("2440")
               processConsultantHistory(booking.fld_secondary_consultant_id);
+
+              // Send emails based on status
+
+              handleEmailNotifications(
+                booking,
+                new_consultation_sts,
+                currentDate,
+                currentTime,
+                req,
+                "consultant"
+              );
             }
 
 
-            // Send emails based on status
-            handleEmailNotifications(
-              booking,
-              new_consultation_sts,
-              currentDate,
-              currentTime,
-              req
-            );
+
+
+
           }
         );
         emitBookingUpdate(bookingid);
@@ -2462,7 +2501,8 @@ const handleEmailNotifications = (
   consultation_sts,
   currentDate,
   currentTime,
-  req
+  req,
+  by = "consultant"
 ) => {
   try {
     // Send email to CRM for specific statuses
@@ -2479,9 +2519,9 @@ const handleEmailNotifications = (
           (err, consultantInfo) => {
             if (err || !consultantInfo) return;
 
-            let sts = consultation_sts == "Accept" ? "Accepted" : consultation_sts =="Reject" ? "Rejected" : consultation_sts;
+            let sts = consultation_sts == "Accept" ? "Accepted" : consultation_sts == "Reject" ? "Rejected" : consultation_sts;
 
-            const subject = `Call ${sts} by ${consultantInfo.fld_name
+            const subject = `Call ${sts} by ${by == "crm" ? crmInfo.fld_name : consultantInfo.fld_name
               } - ${process.env.WEBNAME || "Website"}`;
             let body;
 
@@ -2492,7 +2532,7 @@ const handleEmailNotifications = (
                 }`;
             } else {
               body = `Hi ${crmInfo.fld_name},<br/><br/>Call Id ${booking.id
-                } ${sts} by ${consultantInfo.fld_name
+                } ${sts} by ${by == "crm" ? crmInfo.fld_name : consultantInfo.fld_name
                 } on ${currentDate} at ${currentTime}<br/><br/>Thanks & Regards,<br/>Team - ${process.env.WEBNAME || "Website"
                 }`;
             }
