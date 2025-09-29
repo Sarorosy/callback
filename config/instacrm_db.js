@@ -42,7 +42,7 @@ setInterval(() => {
         SELECT ID
         FROM information_schema.processlist
         WHERE COMMAND = 'Sleep'
-        AND TIME > 15
+        AND TIME > 5
         AND USER = 'pragya'
         AND ID != CONNECTION_ID();
     `, (err, results) => {
