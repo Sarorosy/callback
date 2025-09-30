@@ -2432,14 +2432,26 @@ const updateConsultationStatus = async (req, res) => {
 
               // Send emails based on status
 
-              handleEmailNotifications(
-                booking,
-                new_consultation_sts,
-                currentDate,
-                currentTime,
-                req,
-                "crm"
-              );
+              if (user && user.fld_admin_type == "EXECUTIVE") {
+
+                handleEmailNotifications(
+                  booking,
+                  new_consultation_sts,
+                  currentDate,
+                  currentTime,
+                  req,
+                  "crm"
+                );
+              } else {
+                handleEmailNotifications(
+                  booking,
+                  new_consultation_sts,
+                  currentDate,
+                  currentTime,
+                  req,
+                  "consultant"
+                );
+              }
             }
             else if (
               booking.fld_secondary_consultant_id === 0 &&
