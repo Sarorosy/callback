@@ -1120,26 +1120,32 @@ const updateCallScheduling = (req, res) => {
               admin_email: admin.fld_email,
             };
 
-            sendRescheduleMail(
-              {
-                booking: fullBooking,
-                oldDateTime: `${oldBookingRow.fld_booking_date} ${oldBookingRow.fld_booking_slot}`,
-                newDateTime: `${bookingDate} ${slot}`,
-              },
-              (err) => {
-                if (err) {
-                  console.error(" Email sending failed:", err);
-                } else {
-                  console.log("Reschedule email sent successfully");
-                }
+            // sendRescheduleMail(
+            //   {
+            //     booking: fullBooking,
+            //     oldDateTime: `${oldBookingRow.fld_booking_date} ${oldBookingRow.fld_booking_slot}`,
+            //     newDateTime: `${bookingDate} ${slot}`,
+            //   },
+            //   (err) => {
+            //     if (err) {
+            //       console.error(" Email sending failed:", err);
+            //     } else {
+            //       console.log("Reschedule email sent successfully");
+            //     }
 
-                emitBookingUpdate(bookingId);
-                return res.json({
-                  status: true,
-                  message: "Call Rescheduled successfully.",
-                });
-              }
-            );
+            //     emitBookingUpdate(bookingId);
+            //     return res.json({
+            //       status: true,
+            //       message: "Call Rescheduled successfully.",
+            //     });
+            //   }
+            // );
+
+            emitBookingUpdate(bookingId);
+            return res.json({
+              status: true,
+              message: "Call Rescheduled successfully.",
+            });
           };
 
           if (secondaryConsultantId) {
@@ -2585,23 +2591,23 @@ const handleEmailNotifications = (
       });
     }
 
-    // Handle client notifications for specific statuses
-    if (["Accept", "Reject", "Rescheduled"].includes(consultation_sts)) {
+    // Handle client notifications for specific statuses //"Accept", "Reject", "Rescheduled"
+    if (["Accept"].includes(consultation_sts)) {
       bookingModel.getFullBookingData(booking.id, (err, bookingInfo) => {
         if (err || !bookingInfo) return;
 
         if (consultation_sts === "Accept") {
           handleAcceptedBookingNotification(bookingInfo);
         } else if (["Reject", "Rescheduled"].includes(consultation_sts)) {
-          handleRejectedOrRescheduledNotification(
-            bookingInfo,
-            consultation_sts
-          );
+          // handleRejectedOrRescheduledNotification(
+          //   bookingInfo,
+          //   consultation_sts
+          // );
         }
       });
     }
   } catch (error) {
-    console.error("Error in handleEmailNotifications:", error);
+    console.error("Error in handleEmail Notifications:", error);
   }
 };
 
@@ -2652,6 +2658,19 @@ const handleAcceptedBookingNotification = (bookingInfo) => {
         }
       }
     );
+
+    // sendRescheduleMail(
+    //   {
+    //     booking: bookingInfo,
+    //     oldDateTime: `${bookingInfo.fld_booking_date_old} ${bookingInfo.fld_booking_slot_old}`,
+    //     newDateTime: `${bookingInfo.fld_booking_date} ${bookingInfo.fld_booking_slot}`,
+    //   },
+    //   (err) => {
+    //     if (err) {
+    //       console.error("Error sending reschedule mail:", err);
+    //     }
+    //   }
+    // );
   } catch (error) {
     console.error("Error in handleAcceptedBookingNotification:", error);
   }

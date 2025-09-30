@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 
 var pool = mysql.createPool({
-    connectionLimit: 20,
+    connectionLimit: 40,
     host: '162.241.126.79',
     user: 'pragya',
     password: 'mK%0f35v',
@@ -42,7 +42,7 @@ setInterval(() => {
         SELECT ID
         FROM information_schema.processlist
         WHERE COMMAND = 'Sleep'
-        AND TIME > 5
+        AND TIME > 3
         AND USER = 'pragya'
         AND ID != CONNECTION_ID();
     `, (err, results) => {
