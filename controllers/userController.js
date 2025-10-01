@@ -183,7 +183,7 @@ const updateUser = (req, res) => {
       (err, result) => {
         if (err) {
           console.error("Update Error:", err);
-          return res.status(500).json({ status: false, message: "Database error" });
+          return res.status(500).json({ status: false, message: "Database error "+ err });
         }
         bookingModel.getAdminById(user_id, (err, updatedUser) => {
         if (err) {

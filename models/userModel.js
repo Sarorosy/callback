@@ -230,7 +230,7 @@ const updateUser = (userData, callback) => {
       name,
       email,
       phone,
-      consultant_type || "",
+      consultant_type || null,
       subadmin_type || "",
       JSON.stringify(permissions || []),
       user_id,
