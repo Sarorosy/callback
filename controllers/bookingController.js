@@ -2525,7 +2525,7 @@ const handleEmailNotifications = (
   try {
     // Send email to CRM for specific statuses
     if (
-      ["Accept", "Reject", "Rescheduled", "Cancelled"].includes(
+      ["Accept", "Reject", "Rescheduled"].includes(
         consultation_sts
       )
     ) {
