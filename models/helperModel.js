@@ -27,15 +27,31 @@ const getAllActiveTeams = (callback) => {
 // Get all teams
 const getAllTeams = (callback) => {
 
-
-  const sql = `
-      SELECT * FROM tbl_team
-      ORDER BY fld_addedon DESC
-    `;
+const sql = `
+    SELECT t.*, 
+           JSON_ARRAYAGG(
+             JSON_OBJECT(
+               'id', a.id, 
+               'fld_name', a.fld_name
+             )
+           ) AS users
+    FROM tbl_team t
+    LEFT JOIN tbl_admin a 
+      ON FIND_IN_SET(t.id, a.fld_team_id) > 0
+    GROUP BY t.id
+    ORDER BY t.fld_addedon DESC
+  `;
 
   db.query(sql, (queryErr, results) => {
     if (queryErr) return callback(queryErr, null);
-    return callback(null, results);
+
+    // Fix MySQL JSON returning string instead of array
+    const formattedResults = results.map(team => ({
+      ...team,
+      users: team.users ? JSON.parse(team.users) : []
+    }));
+
+    return callback(null, formattedResults);
   });
 
 };
