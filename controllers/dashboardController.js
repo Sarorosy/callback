@@ -140,6 +140,7 @@ const saveConsultantSettings = (req, res) => {
     selectedWeekDays,
     saturdayOff,
     exclusions,
+    exclusionDetails,
     timeData = {},
   } = req.body;
 
@@ -155,6 +156,7 @@ const saveConsultantSettings = (req, res) => {
     fld_selected_week_days: selectedWeekDays || null,
     fld_saturday_off: saturdayOff || null,
     fld_days_exclusion: exclusions || null,
+    fld_days_exclusion_details: exclusionDetails || null,
 
     fld_sun_time_data: timeData.sun_time_data ?? null,
     fld_mon_time_data: timeData.mon_time_data ?? null,
