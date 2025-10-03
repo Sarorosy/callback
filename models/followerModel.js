@@ -51,18 +51,24 @@ const getAllFollowers = (usertype, userid, callback) => {
       tbl_user.fld_pincode, 
       tbl_user.fld_country 
     FROM tbl_follower 
-    JOIN tbl_booking ON tbl_booking.id = tbl_follower.bookingid 
-    LEFT JOIN tbl_admin as addedby ON tbl_booking.fld_addedby = addedby.id 
-    LEFT JOIN tbl_admin as consultant ON tbl_booking.fld_consultantid = consultant.id 
-    LEFT JOIN tbl_admin as follower_consultant ON tbl_follower.follower_consultant_id = follower_consultant.id
-    JOIN tbl_user ON tbl_booking.fld_userid = tbl_user.id
+    JOIN tbl_booking 
+      ON tbl_booking.id = tbl_follower.bookingid 
+    LEFT JOIN tbl_admin as addedby 
+      ON tbl_booking.fld_addedby = addedby.id 
+    LEFT JOIN tbl_admin as consultant 
+      ON tbl_follower.consultantid = consultant.id 
+    LEFT JOIN tbl_admin as follower_consultant 
+      ON tbl_follower.follower_consultant_id = follower_consultant.id
+    JOIN tbl_user 
+      ON tbl_booking.fld_userid = tbl_user.id
   `;
 
   const params = [];
 
   // If consultant, filter by their id
   if (usertype === "CONSULTANT") {
-    sql += " WHERE tbl_follower.consultantid = ? OR tbl_follower.follower_consultant_id = ?";
+    sql +=
+      " WHERE tbl_follower.consultantid = ? OR tbl_follower.follower_consultant_id = ?";
     params.push(userid, userid);
   }
 
@@ -73,6 +79,7 @@ const getAllFollowers = (usertype, userid, callback) => {
     return callback(null, results);
   });
 };
+
 
 
 const insertBookingHistory = (data, callback) => {
