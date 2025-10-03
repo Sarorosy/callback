@@ -1120,32 +1120,36 @@ const updateCallScheduling = (req, res) => {
               admin_email: admin.fld_email,
             };
 
-            // sendRescheduleMail(
-            //   {
-            //     booking: fullBooking,
-            //     oldDateTime: `${oldBookingRow.fld_booking_date} ${oldBookingRow.fld_booking_slot}`,
-            //     newDateTime: `${bookingDate} ${slot}`,
-            //   },
-            //   (err) => {
-            //     if (err) {
-            //       console.error(" Email sending failed:", err);
-            //     } else {
-            //       console.log("Reschedule email sent successfully");
-            //     }
+            if (oldBookingRow.fld_call_confirmation_status && oldBookingRow.fld_call_confirmation_status == "Call Confirmed by Client") {
+              sendRescheduleMail(
+                {
+                  booking: fullBooking,
+                  oldDateTime: `${oldBookingRow.fld_booking_date} ${oldBookingRow.fld_booking_slot}`,
+                  newDateTime: `${bookingDate} ${slot}`,
+                },
+                (err) => {
+                  if (err) {
+                    console.error(" Email sending failed:", err);
+                  } else {
+                    console.log("Reschedule email sent successfully");
+                  }
 
-            //     emitBookingUpdate(bookingId);
-            //     return res.json({
-            //       status: true,
-            //       message: "Call Rescheduled successfully.",
-            //     });
-            //   }
-            // );
+                  emitBookingUpdate(bookingId);
+                  return res.json({
+                    status: true,
+                    message: "Call Rescheduled successfully.",
+                  });
+                }
+              )
+            } else {
+              emitBookingUpdate(bookingId);
+              return res.json({
+                status: true,
+                message: "Call Rescheduled successfully.",
+              });
+            }
 
-            emitBookingUpdate(bookingId);
-            return res.json({
-              status: true,
-              message: "Call Rescheduled successfully.",
-            });
+
           };
 
           if (secondaryConsultantId) {
